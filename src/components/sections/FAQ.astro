@@ -31,10 +31,35 @@ const faqs: FAQ[] = [
 <section id="faq" class="mb-16">
   <h2 class="text-3xl font-bold font-display text-accent mb-8 text-center">常见问题</h2>
   <div class="space-y-4">
-    {faqs.map(faq => (
-      <div class="bg-card hover:bg-card-hover backdrop-blur-sm rounded-lg p-6 transition-all duration-300">
-        <h3 class="font-bold text-xl mb-2 text-secondary">{faq.question}</h3>
-        <p class="text-text">{faq.answer}</p>
+    {faqs.map((faq, index) => (
+      <div class="group" x-data="{ open: false }">
+        <button
+          class="w-full bg-card hover:bg-card-hover backdrop-blur-sm rounded-lg p-6 transition-all duration-300 flex justify-between items-center"
+          @click="open = !open"
+          aria-expanded="false"
+          :aria-expanded="open"
+          aria-controls={`faq-answer-${index}`}
+        >
+          <h3 class="font-bold text-xl text-secondary text-left">{faq.question}</h3>
+          <svg 
+            class="w-6 h-6 transform transition-transform duration-300" 
+            :class="open ? 'rotate-180' : ''"
+            xmlns="http://www.w3.org/2000/svg" 
+            fill="none" 
+            viewBox="0 0 24 24" 
+            stroke="currentColor"
+          >
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+        <div 
+          id={`faq-answer-${index}`}
+          x-show="open"
+          x-collapse
+          class="text-text p-6 bg-card/50 rounded-b-lg mt-1"
+        >
+          <p>{faq.answer}</p>
+        </div>
       </div>
     ))}
   </div>
