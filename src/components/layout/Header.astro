@@ -1,0 +1,20 @@
+---
+const navItems = [
+  { href: "#play-fiddlebops", text: "Play" },
+  { href: "#features", text: "Features" },
+  { href: "#faq", text: "FAQ" },
+];
+---
+
+<header class="sticky top-0 bg-background-light bg-opacity-95 z-10 shadow-md">
+  <nav class="container mx-auto px-4 py-4 flex justify-between items-center">
+    <a href="/" class="text-xl font-bold text-primary">FiddleBops</a>
+    <ul class="flex space-x-4">
+      {navItems.map(item => (
+        <li>
+          <a href={item.href} class="text-text hover:text-primary">{item.text}</a>
+        </li>
+      ))}
+    </ul>
+  </nav>
+</header> 

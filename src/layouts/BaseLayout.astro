@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css'; // 确保引入全局样式
+import gamePreview from '/src/assets/FiddleBops.webp';
 const { title, description } = Astro.props;
 ---
 
@@ -9,12 +10,29 @@ const { title, description } = Astro.props;
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <meta name="keywords" content="FiddleBops, 音乐游戏, 音乐创作, 在线游戏, Incredibox" />
+  <meta name="robots" content="index, follow" />
+  <meta property="og:title" content={title} />
+  <meta property="og:description" content={description} />
+  <meta property="og:type" content="website" />
+  <link rel="canonical" href="https://fiddlebops.com" />
   <link rel="stylesheet" href="node_modules/@fortawesome/fontawesome-free/css/all.min.css">
   <meta name="generator" content={Astro.generator} />
   <title>{title}</title>
   <meta name="description" content={description}>
+  
+  {/* 预加载关键资源 */}
+  <link rel="preload" as="image" href={gamePreview.src} />
+  
+  {/* 告诉浏览器使用渐进式加载 */}
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  
+  {/* 指示浏览器预连接到游戏域名 */}
+  <link rel="preconnect" href="https://silkycell.github.io" />
 </head>
-<body class="bg-background text-text">
-  <slot />
+<body class="bg-gradient-radial from-background via-background-light to-background text-text min-h-screen">
+  <div class="bg-gradient-to-b from-transparent to-background/50 min-h-screen">
+    <slot />
+  </div>
 </body>
 </html>

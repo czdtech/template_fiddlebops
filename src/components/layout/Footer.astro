@@ -1,0 +1,49 @@
+---
+const currentYear = new Date().getFullYear();
+---
+
+<footer class="bg-card backdrop-blur-sm py-8 mt-16">
+  <div class="container mx-auto px-4">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      {/* 左侧：关于 */}
+      <div>
+        <h3 class="text-xl font-bold text-accent mb-4">关于 FiddleBops</h3>
+        <p class="text-text">一款由粉丝创作的音乐创作游戏，让每个人都能轻松创作音乐。</p>
+      </div>
+      
+      {/* 中间：快速链接 */}
+      <div>
+        <h3 class="text-xl font-bold text-accent mb-4">快速链接</h3>
+        <ul class="space-y-2">
+          <li><a href="#play-fiddlebops" class="text-text hover:text-secondary transition-colors">开始游戏</a></li>
+          <li><a href="#features" class="text-text hover:text-secondary transition-colors">游戏特色</a></li>
+          <li><a href="#faq" class="text-text hover:text-secondary transition-colors">常见问题</a></li>
+        </ul>
+      </div>
+      
+      {/* 右侧：社交媒体 */}
+      <div>
+        <h3 class="text-xl font-bold text-accent mb-4">关注我们</h3>
+        <div class="flex space-x-4">
+          <a href="#" class="text-text hover:text-secondary transition-colors">
+            <i class="fab fa-github text-2xl"></i>
+          </a>
+          <a href="#" class="text-text hover:text-secondary transition-colors">
+            <i class="fab fa-twitter text-2xl"></i>
+          </a>
+          <a href="#" class="text-text hover:text-secondary transition-colors">
+            <i class="fab fa-discord text-2xl"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+    
+    {/* 版权信息 */}
+    <div class="text-center mt-8 pt-8 border-t border-background-light">
+      <p class="text-text">
+        © {currentYear} FiddleBops. 保留所有权利。
+        <span class="text-secondary">由粉丝用❤️制作</span>
+      </p>
+    </div>
+  </div>
+</footer> 

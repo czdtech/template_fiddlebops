@@ -1,0 +1,109 @@
+---
+import { Image } from 'astro:assets';
+import gamePreview from '/src/assets/FiddleBops.webp';
+import ErrorBoundary from '../ErrorBoundary.astro';
+---
+
+<section id="play-fiddlebops" class="mb-16">
+  <ErrorBoundary fallback="游戏加载失败，请检查网络连接后重试" />
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "VideoGame",
+      "name": "FiddleBops",
+      "description": "一款由粉丝创作的音乐创作游戏",
+      "image": "/src/assets/FiddleBops.webp",
+      "url": "https://silkycell.github.io/FiddleBops/",
+      "genre": "音乐游戏",
+      "gamePlatform": "Web Browser",
+      "applicationCategory": "Game",
+      "interactionType": "UserConsent"
+    }
+  </script>
+  <h2 class="text-3xl font-bold font-display text-secondary mb-8 text-center">立即畅玩</h2>
+  <div class="relative w-full max-w-4xl mx-auto">
+    <div id="iframe-placeholder" class="absolute inset-0 flex justify-center items-center z-10">
+      <div class="absolute inset-0 backdrop-blur-sm">
+        <Image 
+          src={gamePreview}
+          alt="FiddleBops 游戏预览"
+          class="w-full h-full object-cover"
+          format="webp"
+        />
+        <div class="absolute inset-0 bg-gradient-to-t from-primary/80 via-background/50 to-background/80"></div>
+      </div>
+      <button 
+        id="play-button" 
+        aria-label="开始游戏"
+        class="relative z-20 bg-accent hover:bg-accent-dark text-text-light font-bold py-4 px-8 rounded-full shadow-lg transform hover:scale-105 transition-all duration-300 text-lg border-2 border-text-light/20 hover:border-text-light/40 pulse-animation">
+        开始游戏
+      </button>
+    </div>
+    <div id="iframe-container" class="relative">
+      <iframe
+        id="fiddlebops-iframe"
+        data-src="https://silkycell.github.io/FiddleBops/"
+        title="FiddleBops Game"
+        allowfullscreen
+        class="w-full aspect-video border-4 border-primary rounded-lg shadow-xl"
+      ></iframe>
+    </div>
+  </div>
+</section>
+
+<style>
+  @keyframes pulse {
+    0%, 100% {
+      box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4);
+    }
+    50% {
+      box-shadow: 0 0 0 15px rgba(255, 255, 255, 0);
+    }
+  }
+  
+  .pulse-animation {
+    animation: pulse 2s infinite;
+  }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  try {
+    const playButton = document.getElementById('play-button');
+    const iframePlaceholder = document.getElementById('iframe-placeholder');
+    const fiddlebopsIframe = document.getElementById('fiddlebops-iframe');
+
+    if (!playButton || !iframePlaceholder || !fiddlebopsIframe) {
+      throw new window.GameError('页面元素加载失败');
+    }
+
+    const setIframeHeight = () => {
+      const width = fiddlebopsIframe.offsetWidth;
+      const height = (width * 9) / 16;
+      (fiddlebopsIframe as HTMLIFrameElement).style.height = `${height}px`;
+    };
+
+    window.addEventListener('resize', setIframeHeight);
+    setIframeHeight();
+
+    playButton.addEventListener('click', () => {
+      try {
+        (iframePlaceholder as HTMLElement).style.opacity = '0';
+        (iframePlaceholder as HTMLElement).style.pointerEvents = 'none';
+        const iframe = document.getElementById('fiddlebops-iframe') as HTMLIFrameElement;
+        if (iframe) {
+          iframe.src = iframe.dataset.src || '';
+          iframe.onerror = () => {
+            throw new window.GameError('游戏加载失败，请检查网络连接');
+          };
+        }
+        (fiddlebopsIframe as HTMLIFrameElement).focus();
+      } catch (error) {
+        window.showError(error instanceof Error ? error.message : '发生了未知错误');
+      }
+    });
+  } catch (error) {
+    window.showError(error instanceof Error ? error.message : '发生了未知错误');
+  }
+});
+</script> 
