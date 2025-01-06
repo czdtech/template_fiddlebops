@@ -1,5 +1,10 @@
 ---
-const faqs = [
+type FAQ = {
+  question: string;
+  answer: string;
+};
+
+const faqs: FAQ[] = [
   {
     question: "什么是 FiddleBops？",
     answer: "FiddleBops 是一款富有创意的音乐制作游戏，玩家可以通过混合独特的角色声音来创作原创作品。"

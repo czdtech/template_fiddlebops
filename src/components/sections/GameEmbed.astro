@@ -1,7 +1,10 @@
 ---
 import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
 import gamePreview from '/src/assets/FiddleBops.webp';
 import ErrorBoundary from '../ErrorBoundary.astro';
+
+interface Props {}
 ---
 
 <section id="play-fiddlebops" class="mb-16">
@@ -67,6 +70,10 @@ import ErrorBoundary from '../ErrorBoundary.astro';
 </style>
 
 <script>
+type DOMEvent = Event & { 
+  currentTarget: EventTarget & HTMLElement;
+};
+
 document.addEventListener('DOMContentLoaded', () => {
   try {
     const playButton = document.getElementById('play-button');
@@ -74,13 +81,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const fiddlebopsIframe = document.getElementById('fiddlebops-iframe');
 
     if (!playButton || !iframePlaceholder || !fiddlebopsIframe) {
-      throw new window.GameError('页面元素加载失败');
+      throw new Error('页面元素加载失败');
     }
 
-    const setIframeHeight = () => {
-      const width = fiddlebopsIframe.offsetWidth;
-      const height = (width * 9) / 16;
-      (fiddlebopsIframe as HTMLIFrameElement).style.height = `${height}px`;
+    const setIframeHeight = (): void => {
+      if (fiddlebopsIframe instanceof HTMLIFrameElement) {
+        const width = fiddlebopsIframe.offsetWidth;
+        const height = (width * 9) / 16;
+        fiddlebopsIframe.style.height = `${height}px`;
+      }
     };
 
     window.addEventListener('resize', setIframeHeight);
@@ -88,22 +97,36 @@ document.addEventListener('DOMContentLoaded', () => {
 
     playButton.addEventListener('click', () => {
       try {
-        (iframePlaceholder as HTMLElement).style.opacity = '0';
-        (iframePlaceholder as HTMLElement).style.pointerEvents = 'none';
-        const iframe = document.getElementById('fiddlebops-iframe') as HTMLIFrameElement;
-        if (iframe) {
-          iframe.src = iframe.dataset.src || '';
-          iframe.onerror = () => {
-            throw new window.GameError('游戏加载失败，请检查网络连接');
-          };
+        if (iframePlaceholder instanceof HTMLElement) {
+          iframePlaceholder.style.opacity = '0';
+          iframePlaceholder.style.pointerEvents = 'none';
         }
-        (fiddlebopsIframe as HTMLIFrameElement).focus();
+        
+        if (fiddlebopsIframe instanceof HTMLIFrameElement) {
+          const dataSrc = fiddlebopsIframe.dataset.src;
+          if (!dataSrc) {
+            throw new Error('游戏源地址未设置');
+          }
+          fiddlebopsIframe.src = dataSrc;
+          fiddlebopsIframe.onerror = () => {
+            throw new Error('游戏加载失败，请检查网络连接');
+          };
+          fiddlebopsIframe.focus();
+        }
       } catch (error) {
-        window.showError(error instanceof Error ? error.message : '发生了未知错误');
+        if (error instanceof Error) {
+          window.showError(error.message);
+        } else {
+          window.showError('发生了未知错误');
+        }
       }
     });
   } catch (error) {
-    window.showError(error instanceof Error ? error.message : '发生了未知错误');
+    if (error instanceof Error) {
+      window.showError(error.message);
+    } else {
+      window.showError('发生了未知错误');
+    }
   }
 });
 </script> 
