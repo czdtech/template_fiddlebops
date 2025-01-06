@@ -1,11 +1,182 @@
 ---
-import Welcome from '../components/Welcome.astro';
-import Layout from '../layouts/Layout.astro';
-
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 
-<Layout>
-	<Welcome />
-</Layout>
+<BaseLayout title="FiddleBops - 释放你的音乐创造力" description="体验 FiddleBops，一款由粉丝创作的独特音乐游戏。">
+    <header class="sticky top-0 bg-background-light bg-opacity-95 z-10 shadow-md">
+        <nav class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <a href="/" class="text-xl font-bold text-primary">FiddleBops</a>
+            <ul class="flex space-x-4">
+               <li><a href="#play-fiddlebops" class="text-text hover:text-primary">Play</a></li>
+               <li><a href="#features" class="text-text hover:text-primary">Features</a></li>
+               <li><a href="#faq" class="text-text hover:text-primary">FAQ</a></li>
+            </ul>
+        </nav>
+    </header>
+  <main class="container mx-auto px-4 py-10">
+    {/* Hero Section */}
+    <section class="mb-16 text-center">
+      <h1 class="text-5xl md:text-6xl font-display font-bold text-primary mb-4">
+        释放你的音乐创造力，尽在 <span class="text-accent">FiddleBops</span>！
+      </h1>
+      <p class="text-lg md:text-xl text-secondary-dark mb-8">
+        一款由粉丝创作的独特音乐游戏，灵感来源于 Incredibox，让你轻松混合声音，创作专属音乐。
+      </p>
+    </section>
+
+    {/* 游戏嵌入 Section */}
+    <section id="play-fiddlebops" class="mb-16">
+      <h2 class="text-3xl font-bold font-display text-secondary mb-8 text-center">立即畅玩</h2>
+      <div class="relative w-full max-w-4xl mx-auto">
+        <div id="iframe-placeholder" class="absolute inset-0 flex justify-center items-center z-10">
+          <div class="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm"
+            style="background-image: url('/FiddleBops.webp'); background-size: cover; background-position: center; filter: brightness(0.6);">
+          </div>
+          <button id="play-button" class="relative z-20 bg-primary hover:bg-primary-dark text-text-light font-bold py-3 px-6 rounded-full shadow-md transform hover:scale-105 transition-transform">
+            开始游戏
+          </button>
+        </div>
+        <iframe
+          id="fiddlebops-iframe"
+          src="https://silkycell.github.io/FiddleBops/"
+          title="FiddleBops Game"
+          allowfullscreen
+          class="w-full aspect-video border-4 border-primary rounded-lg shadow-xl"
+        ></iframe>
+      </div>
+    </section>
+
+    {/* 游戏概述 Section */}
+    <section class="mb-16" id="features">
+      <h2 class="text-3xl font-bold font-display text-secondary mb-8 text-center">FiddleBops 概览</h2>
+      <p class="text-lg mb-6">
+        FiddleBops 是一款由粉丝创作的音乐创作游戏，灵感来源于 <span class="italic">Incredibox</span> universe。旨在为玩家提供一个引人入胜且富有创意的平台，用于混合声音和创作独特的音乐作品。它直接在 Web 浏览器中运行，用户无需下载即可轻松访问游戏。玩家可以将各种角色拖放到舞台上，每个角色都会发出独特的声音，从而创作出层次丰富的音乐曲目。
+      </p>
+    </section>
+
+    {/* 核心功能 Section */}
+    <section class="mb-16 bg-gray-100 py-12 rounded-lg">
+      <div class="container mx-auto px-4 text-center">
+        <h2 class="text-3xl font-bold font-display text-accent mb-8">核心功能</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div>
+            <i class="fas fa-hand-pointer text-4xl text-primary mb-4"></i>
+            <h3 class="font-bold text-xl mb-2">直观的界面</h3>
+            <p class="text-gray-700">用户友好的拖放界面，简化音乐创作过程。</p>
+          </div>
+          <div>
+            <i class="fas fa-user-friends text-4xl text-secondary mb-4"></i>
+            <h3 class="font-bold text-xl mb-2">独特的角色</h3>
+            <p class="text-gray-700">多种粉丝创作的角色可供选择，每个角色都有自己独特的声音和个性。</p>
+          </div>
+          <div>
+            <i class="fas fa-music text-4xl text-accent mb-4"></i>
+            <h3 class="font-bold text-xl mb-2">声音混合</h3>
+            <p class="text-gray-700">鼓励尝试不同的角色组合，解锁隐藏的旋律，创作原创作品。</p>
+          </div>
+          <div>
+            <i class="fas fa-users text-4xl text-accent mb-4"></i>
+            <h3 class="font-bold text-xl mb-2">社区互动</h3>
+            <p class="text-gray-700">建立活跃的社区，玩家可以在这里分享作品，探索他人的作品，并参与挑战。</p>
+          </div>
+          <div>
+            <i class="fas fa-sync-alt text-4xl text-primary mb-4"></i>
+            <h3 class="font-bold text-xl mb-2">定期更新</h3>
+            <p class="text-gray-700">根据社区反馈，不断更新新的角色、声音和功能。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    {/* 常见问题 Section */}
+    <section id="faq" class="mb-16">
+      <h2 class="text-3xl font-bold font-display text-secondary mb-8 text-center">常见问题</h2>
+      <div class="space-y-4">
+        <div class="bg-background-light rounded-lg shadow-md p-4">
+          <h3 class="font-bold text-lg mb-2">什么是 FiddleBops？</h3>
+          <p class="text-gray-700">FiddleBops 是一款富有创意的音乐制作游戏，玩家可以通过混合独特的角色声音来创作原创作品。</p>
+        </div>
+        <div class="bg-background-light rounded-lg shadow-md p-4">
+          <h3 class="font-bold text-lg mb-2">我需要下载任何东西才能玩吗？</h3>
+          <p class="text-gray-700">不需要，FiddleBops 直接在您的 Web 浏览器中运行，无需下载或安装。</p>
+        </div>
+        <div class="bg-background-light rounded-lg shadow-md p-4">
+          <h3 class="font-bold text-lg mb-2">如何开始创作音乐？</h3>
+          <p class="text-gray-700">只需将角色拖到舞台上，即可将他们的声音添加到您的组合中。尝试不同的组合以获得独特的曲目。</p>
+        </div>
+        <div class="bg-background-light rounded-lg shadow-md p-4">
+          <h3 class="font-bold text-lg mb-2">我可以保存我的作品吗？</h3>
+          <p class="text-gray-700">是的，玩家可以保存他们的作品并在社区中与他人分享。</p>
+        </div>
+        <div class="bg-background-light rounded-lg shadow-md p-4">
+          <h3 class="font-bold text-lg mb-2">FiddleBops 可以免费玩吗？</h3>
+          <p class="text-gray-700">是的，这款游戏在 Sprunki InCrediBox 平台上完全免费。</p>
+        </div>
+        <div class="bg-background-light rounded-lg shadow-md p-4">
+          <h3 class="font-bold text-lg mb-2">有哪些特殊功能吗？</h3>
+          <p class="text-gray-700">玩家可以通过尝试各种角色组合来发现隐藏的旋律和奖励内容。</p>
+        </div>
+        <div class="bg-background-light rounded-lg shadow-md p-4">
+          <h3 class="font-bold text-lg mb-2">我可以创建自己的角色吗？</h3>
+          <p class="text-gray-700">虽然目前无法直接创建角色，但玩家可以通过创造性地混合现有角色来进行创作。</p>
+        </div>
+        <div class="bg-background-light rounded-lg shadow-md p-4">
+          <h3 class="font-bold text-lg mb-2">FiddleBops 多久更新一次？</h3>
+          <p class="text-gray-700">更新取决于社区贡献，并会定期发布以引入新内容。</p>
+        </div>
+        <div class="bg-background-light rounded-lg shadow-md p-4">
+          <h3 class="font-bold text-lg mb-2">与其他音乐游戏相比，FiddleBops 有什么独特之处？</h3>
+          <p class="text-gray-700">它将粉丝创作的故事与独特的、基于角色的声音混合系统相结合，从而增强了音乐创作体验。</p>
+        </div>
+        <div class="bg-background-light rounded-lg shadow-md p-4">
+          <h3 class="font-bold text-lg mb-2">如何为 FiddleBops 做出贡献？</h3>
+          <p class="text-gray-700">玩家可以加入社区论坛，分享关于新角色、声音或故事的想法，以帮助塑造未来的更新。</p>
+        </div>
+      </div>
+    </section>
+
+    {/* 视觉展示 Section (待添加实际截图) */}
+    <section class="mb-16">
+      <h2 class="text-3xl font-bold font-display text-primary mb-8 text-center">视觉展示</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <img src="/FiddleBops.webp" alt="FiddleBops 游戏截图" class="rounded-lg shadow-md border-4 border-accent" />
+        <img src="/FiddleBops.webp" alt="FiddleBops 游戏截图" class="rounded-lg shadow-md border-4 border-secondary" />
+      </div>
+    </section>
+  </main>
+</BaseLayout>
+
+<style>
+  /* 引入 Font Awesome 图标 */
+  @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css');
+  #iframe-placeholder {
+    transition: opacity 0.3s ease-in-out;
+  }
+</style>
+
+<script>
+	document.addEventListener('DOMContentLoaded', () => {
+	  const playButton = document.getElementById('play-button');
+	  const iframePlaceholder = document.getElementById('iframe-placeholder');
+	  const fiddlebopsIframe = document.getElementById('fiddlebops-iframe');
+  
+	  if (playButton && iframePlaceholder && fiddlebopsIframe) {
+		// 初始化时设置 iframe 的高度
+		const setIframeHeight = () => {
+		  const width = fiddlebopsIframe.offsetWidth;
+		  const height = (width * 9) / 16; // 16:9 比例
+		  fiddlebopsIframe.style.height = `${height}px`;
+		};
+
+		// 页面加载和窗口调整时设置高度
+		window.addEventListener('resize', setIframeHeight);
+		setIframeHeight();
+
+		playButton.addEventListener('click', () => {
+		  iframePlaceholder.style.opacity = '0';
+		  iframePlaceholder.style.pointerEvents = 'none';
+		  fiddlebopsIframe.focus();
+		});
+	  }
+	});
+  </script>
