@@ -1,0 +1,49 @@
+---
+import { Image } from "astro:assets";
+import gamePreview from "/src/assets/FiddleBops.webp";
+import Button from '../ui/Button.astro';
+---
+
+<section id="play-fiddlebops" class="relative">
+  <h2 class="text-3xl sm:text-4xl font-bold font-display text-secondary mb-12 text-center">
+    开始游戏
+  </h2>
+  <div class="aspect-video w-full max-w-5xl mx-auto rounded-xl overflow-hidden shadow-lg border-4 border-secondary relative">
+    <div id="iframe-placeholder" class="absolute inset-0 bg-card flex items-center justify-center">
+      <Image
+        src={gamePreview}
+        alt="FiddleBops 游戏预览"
+        class="absolute inset-0 w-full h-full object-cover opacity-20"
+        width={1200}
+        height={675}
+        loading="eager"
+      />
+      <Button id="play-button" variant="primary" class="relative z-10">
+        开始游戏
+      </Button>
+    </div>
+    <iframe
+      id="game-iframe"
+      src="about:blank"
+      class="w-full h-full"
+      style="display: none;"
+      title="FiddleBops 游戏"
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    >
+    </iframe>
+  </div>
+</section>
+
+<script>
+  const playButton = document.getElementById('play-button');
+  const placeholder = document.getElementById('iframe-placeholder');
+  const iframe = document.getElementById('game-iframe') as HTMLIFrameElement;
+
+  playButton?.addEventListener('click', () => {
+    if (placeholder && iframe) {
+      iframe.src = 'https://your-game-url.com';
+      iframe.style.display = 'block';
+      placeholder.style.display = 'none';
+    }
+  });
+</script> 

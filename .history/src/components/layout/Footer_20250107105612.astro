@@ -1,0 +1,125 @@
+---
+const currentYear = new Date().getFullYear();
+
+// 定义社交媒体链接
+interface SocialLink {
+  platform: string;
+  url: string;
+  icon: string;
+  label: string;
+}
+
+const socialLinks: SocialLink[] = [
+  {
+    platform: "github",
+    url: "#",
+    icon: "fa-github",
+    label: "GitHub",
+  },
+  {
+    platform: "twitter",
+    url: "#",
+    icon: "fa-twitter",
+    label: "Twitter",
+  },
+  {
+    platform: "discord",
+    url: "#",
+    icon: "fa-discord",
+    label: "Discord",
+  },
+];
+---
+
+<footer class="bg-card backdrop-blur-sm py-8 mt-16">
+  <div class="container mx-auto px-4">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <!-- 关于部分 -->
+      <section aria-labelledby="about-heading">
+        <h2 id="about-heading" class="text-xl font-bold text-accent mb-4">
+          关于 FiddleBops
+        </h2>
+        <p class="text-text">
+          一款由粉丝创作的音乐创作游戏，让每个人都能轻松创作音乐。
+        </p>
+      </section>
+
+      <!-- 快速链接 -->
+      <nav aria-labelledby="quick-links-heading">
+        <h2 id="quick-links-heading" class="text-xl font-bold text-accent mb-4">
+          快速链接
+        </h2>
+        <ul class="space-y-2">
+          <li>
+            <a
+              href="#play-fiddlebops"
+              class="text-text hover:text-secondary transition-colors duration-200"
+            >
+              开始游戏
+            </a>
+          </li>
+          <li>
+            <a
+              href="#features"
+              class="text-text hover:text-secondary transition-colors duration-200"
+            >
+              游戏特色
+            </a>
+          </li>
+          <li>
+            <a
+              href="#faq"
+              class="text-text hover:text-secondary transition-colors duration-200"
+            >
+              常见问题
+            </a>
+          </li>
+        </ul>
+      </nav>
+
+      <!-- 社交媒体 -->
+      <section aria-labelledby="social-heading">
+        <h2 id="social-heading" class="text-xl font-bold text-accent mb-4">
+          关注我们
+        </h2>
+        <div class="flex space-x-4">
+          {
+            socialLinks.map(({ platform, url, icon, label }) => (
+              <a
+                href={url}
+                class="text-text hover:text-secondary transition-colors duration-200"
+                aria-label={label}
+              >
+                <i class={`fab ${icon} text-2xl`} aria-hidden="true" />
+                <span class="sr-only">{label}</span>
+              </a>
+            ))
+          }
+        </div>
+      </section>
+    </div>
+
+    <!-- 版权信息 -->
+    <div class="text-center mt-8 pt-8 border-t border-background-light">
+      <p class="text-text">
+        © {currentYear} FiddleBops. 保留所有权利。
+        <span class="text-secondary">由粉丝用❤️制作</span>
+      </p>
+    </div>
+  </div>
+</footer>
+
+<!-- 添加结构化数据 -->
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "FiddleBops",
+    "url": "https://your-domain.com",
+    "sameAs": [
+      "https://github.com/your-github",
+      "https://twitter.com/your-twitter",
+      "https://discord.gg/your-discord"
+    ]
+  }
+</script>

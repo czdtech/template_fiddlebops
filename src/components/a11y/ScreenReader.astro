@@ -1,0 +1,113 @@
+---
+interface Props {
+  id?: string;
+  announcePolite?: string;
+  announceAssertive?: string;
+  class?: string;
+}
+
+const {
+  id,
+  announcePolite,
+  announceAssertive,
+  class: className = "",
+} = Astro.props;
+---
+
+<div class:list={["screen-reader-content", className]}>
+  {
+    announcePolite && (
+      <div
+        id={`${id}-polite`}
+        class="sr-announce"
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+      >
+        {announcePolite}
+      </div>
+    )
+  }
+  {
+    announceAssertive && (
+      <div
+        id={`${id}-assertive`}
+        class="sr-announce"
+        role="alert"
+        aria-live="assertive"
+        aria-atomic="true"
+      >
+        {announceAssertive}
+      </div>
+    )
+  }
+</div>
+
+<style>
+  .screen-reader-content {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .sr-announce {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+</style>
+
+<script>
+  class ScreenReaderAnnouncer extends HTMLElement {
+    private politeRegion: HTMLElement | null = null;
+    private assertiveRegion: HTMLElement | null = null;
+
+    constructor() {
+      super();
+      this.initRegions();
+    }
+
+    private initRegions() {
+      this.politeRegion = this.querySelector('[aria-live="polite"]');
+      this.assertiveRegion = this.querySelector('[aria-live="assertive"]');
+    }
+
+    public announce(
+      message: string,
+      priority: "polite" | "assertive" = "polite"
+    ) {
+      const region =
+        priority === "polite" ? this.politeRegion : this.assertiveRegion;
+      if (region) {
+        region.textContent = "";
+        // 使用 setTimeout 确保屏幕阅读器能够识别内容变化
+        setTimeout(() => {
+          region.textContent = message;
+        }, 100);
+      }
+    }
+
+    public clear(priority?: "polite" | "assertive") {
+      if (!priority || priority === "polite") {
+        this.politeRegion && (this.politeRegion.textContent = "");
+      }
+      if (!priority || priority === "assertive") {
+        this.assertiveRegion && (this.assertiveRegion.textContent = "");
+      }
+    }
+  }
+
+  customElements.define("screen-reader-announcer", ScreenReaderAnnouncer);
+</script>

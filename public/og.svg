@@ -1,0 +1,41 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="630" fill="#0F172A"/>
+  
+  <!-- 背景渐变 -->
+  <path fill-rule="evenodd" clip-rule="evenodd" d="M0 0H1200V630H0V0Z" fill="url(#paint0_radial)"/>
+  
+  <!-- Logo -->
+  <g transform="translate(120, 215)">
+    <rect width="200" height="200" rx="40" fill="#4F46E5"/>
+    <path d="M100 50C72.3858 50 50 72.3858 50 100C50 127.614 72.3858 150 100 150C127.614 150 150 127.614 150 100C150 72.3858 127.614 50 100 50ZM100 137.5C79.2893 137.5 62.5 120.711 62.5 100C62.5 79.2893 79.2893 62.5 100 62.5C120.711 62.5 137.5 79.2893 137.5 100C137.5 120.711 120.711 137.5 100 137.5Z" fill="white"/>
+    <path d="M100 75C89.5 75 81.25 83.25 81.25 93.75V118.75C81.25 122.188 84.0625 125 87.5 125C90.9375 125 93.75 122.188 93.75 118.75V93.75C93.75 90.3125 96.5625 87.5 100 87.5C103.438 87.5 106.25 90.3125 106.25 93.75V118.75C106.25 122.188 109.062 125 112.5 125C115.938 125 118.75 122.188 118.75 118.75V93.75C118.75 83.25 110.5 75 100 75Z" fill="white"/>
+  </g>
+  
+  <!-- 文字 -->
+  <text x="400" y="280" fill="white" font-family="Inter" font-size="72" font-weight="700">
+    FiddleBops
+  </text>
+  <text x="400" y="350" fill="#94A3B8" font-family="Inter" font-size="36" font-weight="400">
+    探索音乐的无限可能
+  </text>
+  
+  <!-- 装饰元素 -->
+  <circle cx="1000" cy="200" r="100" fill="url(#paint1_radial)" opacity="0.1"/>
+  <circle cx="200" cy="500" r="150" fill="url(#paint2_radial)" opacity="0.1"/>
+  
+  <!-- 渐变定义 -->
+  <defs>
+    <radialGradient id="paint0_radial" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(600 315) rotate(90) scale(315 600)">
+      <stop stop-color="#0F172A"/>
+      <stop offset="1" stop-color="#020617"/>
+    </radialGradient>
+    <radialGradient id="paint1_radial" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(1000 200) rotate(90) scale(100)">
+      <stop stop-color="#8B5CF6"/>
+      <stop offset="1" stop-color="#8B5CF6" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="paint2_radial" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(200 500) rotate(90) scale(150)">
+      <stop stop-color="#4F46E5"/>
+      <stop offset="1" stop-color="#4F46E5" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+</svg> 

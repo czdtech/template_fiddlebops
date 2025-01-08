@@ -1,0 +1,30 @@
+---
+interface Props {
+  class?: string;
+  as?: keyof HTMLElementTagNameMap;
+}
+
+const { class: className = "", as: Element = "div" } = Astro.props;
+---
+
+<Element
+  class:list={["mx-auto w-full px-4 sm:px-6 lg:px-8", "max-w-7xl", className]}
+>
+  <slot />
+</Element>
+
+<style>
+  /* 添加容器过渡动画 */
+  div {
+    transition: padding var(--theme-transition-duration)
+      var(--theme-transition-timing);
+  }
+
+  /* 确保容器在小屏幕上有合适的边距 */
+  @media (max-width: 640px) {
+    div {
+      padding-left: max(1rem, env(safe-area-inset-left));
+      padding-right: max(1rem, env(safe-area-inset-right));
+    }
+  }
+</style>

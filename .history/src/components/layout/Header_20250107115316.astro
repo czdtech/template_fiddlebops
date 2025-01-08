@@ -1,0 +1,83 @@
+---
+// 建议将导航项配置移到配置文件
+// src/config/navigation.ts
+export const navItems = [...]
+---
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<header class="sticky top-0 bg-background-light bg-opacity-95 z-10 shadow-md">
+  <nav class="container mx-auto px-4 py-4" aria-label="Main navigation">
+    <div class="flex justify-between items-center">
+      <a
+        href="/"
+        class="text-xl font-bold text-primary hover:text-primary/90 transition-colors"
+        aria-label="FiddleBops 首页"
+      >
+        FiddleBops
+      </a>
+
+      {/* 移动端菜单按钮 */}
+      <button
+        type="button"
+        class="lg:hidden"
+        aria-label="切换菜单"
+        aria-expanded="false"
+        id="menu-button"
+      >
+        <span class="sr-only">打开菜单</span>
+        <svg
+          class="w-6 h-6"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+
+      {/* 导航菜单 */}
+      <ul class="hidden lg:flex space-x-8" id="navigation-menu">
+        {
+          navItems.map(({ href, text, description }) => (
+            <li>
+              <a
+                href={href}
+                class="text-text hover:text-primary transition-colors duration-200 py-2"
+                aria-label={description}
+              >
+                {text}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </nav>
+</header>
+
+<script>
+  // 处理移动端菜单
+  const menuButton = document.getElementById("menu-button");
+  const navigationMenu = document.getElementById("navigation-menu");
+
+  if (menuButton && navigationMenu) {
+    menuButton.addEventListener("click", () => {
+      const isExpanded = menuButton.getAttribute("aria-expanded") === "true";
+      menuButton.setAttribute("aria-expanded", (!isExpanded).toString());
+      navigationMenu.classList.toggle("hidden");
+    });
+  }
+
+  // 添加键盘支持
+  menuButton?.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      menuButton.click();
+    }
+  });
+</script>

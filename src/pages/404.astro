@@ -1,0 +1,81 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { siteConfig } from "@/config/site";
+
+const title = "页面未找到 | " + siteConfig.title;
+const description = "抱歉，您访问的页面不存在。";
+---
+
+<BaseLayout {title} {description}>
+  <section class="error-page">
+    <div class="container">
+      <div class="error-content">
+        <h1>404</h1>
+        <p class="error-message">抱歉，您访问的页面不存在</p>
+        <p class="error-description">
+          页面可能已被移动或删除。让我们带您回到首页继续探索吧！
+        </p>
+        <a href="/" class="button">返回首页</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .error-page {
+    min-height: calc(100vh - var(--header-height));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 0;
+    text-align: center;
+  }
+
+  .error-content {
+    max-width: 600px;
+    margin: 0 auto;
+    animation: fade-in 0.5s ease-out;
+  }
+
+  h1 {
+    font-size: clamp(6rem, 20vw, 12rem);
+    line-height: 1;
+    background: linear-gradient(
+      to right,
+      var(--color-primary),
+      var(--color-accent)
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 1rem;
+  }
+
+  .error-message {
+    font-size: clamp(1.5rem, 4vw, 2rem);
+    margin-bottom: 1rem;
+    color: var(--color-text);
+  }
+
+  .error-description {
+    font-size: 1.125rem;
+    margin-bottom: 2rem;
+    color: var(--color-text-muted);
+  }
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @media (max-width: 640px) {
+    .error-page {
+      padding: 1rem;
+    }
+  }
+</style>

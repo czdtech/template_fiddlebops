@@ -1,0 +1,78 @@
+---
+interface Props {
+  fallback?: string;
+  level?: 'warning' | 'error';
+  retry?: boolean;
+}
+
+const { 
+  fallback = "出现了一些问题，请稍后再试",
+  level = 'error',
+  retry = true
+} = Astro.props;
+---
+
+<div id="error-boundary" class="hidden">
+  <div
+    class="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center"
+  >
+    <div class="bg-card p-6 rounded-lg shadow-xl max-w-md mx-4">
+      <h3 class={`text-xl font-bold ${level === 'error' ? 'text-red-500' : 'text-yellow-500'} mb-4`}>
+        {level === 'error' ? '糟糕！' : '注意！'}
+      </h3>
+      <p class="text-text mb-4" id="error-message">{fallback}</p>
+      {retry && (
+        <button
+          onclick="window.location.reload()"
+          class="bg-primary hover:bg-primary-dark text-text-light px-4 py-2 rounded-md transition-colors"
+        >
+          刷新页面
+        </button>
+      )}
+    </div>
+  </div>
+</div>
+
+<script>
+  interface CustomError extends Error {
+    name: string;
+  }
+
+  class GameError extends Error implements CustomError {
+    name: string;
+    constructor(message: string) {
+      super(message);
+      this.name = "GameError";
+    }
+  }
+
+  function showError(message: string): void {
+    const errorBoundary = document.getElementById("error-boundary");
+    const errorMessage = document.getElementById("error-message");
+    if (errorBoundary && errorMessage) {
+      errorMessage.textContent = message;
+      errorBoundary.classList.remove("hidden");
+    }
+  }
+
+  window.addEventListener("error", (event: ErrorEvent): void => {
+    showError(event.message);
+  });
+
+  window.addEventListener(
+    "unhandledrejection",
+    (event: PromiseRejectionEvent): void => {
+      showError(event.reason?.message || "发生了未知错误");
+    }
+  );
+
+  declare global {
+    interface Window {
+      GameError: typeof GameError;
+      showError: typeof showError;
+    }
+  }
+
+  window.GameError = GameError;
+  window.showError = showError;
+</script>

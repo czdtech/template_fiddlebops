@@ -3,12 +3,25 @@
   "compilerOptions": {
     "strictNullChecks": true,
     "allowJs": true,
+    "jsx": "preserve",
+    "jsxImportSource": "react",
     "types": ["astro/client"],
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"]
-    }
+    },
+    "moduleResolution": "node",
+    "module": "esnext",
+    "allowSyntheticDefaultImports": true,
+    "isolatedModules": true
   },
-  "include": ["src/**/*", "*.ts", "*.tsx", "*.js", "*.jsx", "*.astro"],
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "src/pages/**/*.astro",
+    "src/layouts/**/*.astro",
+    "src/components/**/*.astro",
+    ".astro/**/*"
+  ],
   "exclude": ["node_modules", "dist"]
 }

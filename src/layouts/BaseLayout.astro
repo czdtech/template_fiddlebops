@@ -1,38 +1,118 @@
 ---
-import '../styles/global.css'; // 确保引入全局样式
-import gamePreview from '/src/assets/FiddleBops.webp';
-const { title, description } = Astro.props;
+import { siteConfig } from "@/config/site";
+import Header from "@/components/layout/Header.astro";
+import Footer from "@/components/layout/Footer.astro";
+import "@/styles/global.css";
+import { getLangFromUrl } from "@/i18n/utils";
+
+interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+  canonicalURL?: URL | string;
+}
+
+const {
+  title = siteConfig.title,
+  description = siteConfig.description,
+  image = siteConfig.ogImage,
+  canonicalURL = new URL(Astro.url.pathname, Astro.site),
+} = Astro.props;
+
+const formattedTitle =
+  title === siteConfig.title ? title : `${title} | ${siteConfig.title}`;
+
+const lang = getLangFromUrl(Astro.url);
 ---
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width">
-  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-  <meta name="keywords" content="FiddleBops, 音乐游戏, 音乐创作, 在线游戏, Incredibox" />
-  <meta name="robots" content="index, follow" />
-  <meta property="og:title" content={title} />
-  <meta property="og:description" content={description} />
-  <meta property="og:type" content="website" />
-  <link rel="canonical" href="https://fiddlebops.com" />
-  <link rel="stylesheet" href="node_modules/@fortawesome/fontawesome-free/css/all.min.css">
-  <meta name="generator" content={Astro.generator} />
-  <title>{title}</title>
-  <meta name="description" content={description}>
-  
-  {/* 预加载关键资源 */}
-  <link rel="preload" as="image" href={gamePreview.src} />
-  
-  {/* 告诉浏览器使用渐进式加载 */}
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  
-  {/* 指示浏览器预连接到游戏域名 */}
-  <link rel="preconnect" href="https://silkycell.github.io" />
-</head>
-<body class="bg-gradient-radial from-background via-background-light to-background text-text min-h-screen">
-  <div class="bg-gradient-to-b from-transparent to-background/50 min-h-screen">
-    <slot />
-  </div>
-</body>
+<!doctype html>
+<html lang={lang} class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{formattedTitle}</title>
+    <meta name="description" content={description} />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={image} />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content={canonicalURL} />
+    <meta property="twitter:title" content={title} />
+    <meta property="twitter:description" content={description} />
+    <meta property="twitter:image" content={image} />
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href={canonicalURL} />
+
+    <!-- Sitemap -->
+    <link rel="sitemap" href="/sitemap-index.xml" />
+
+    <!-- Alternate language versions -->
+    <link rel="alternate" href="/" hreflang="en" />
+    <link rel="alternate" href="/zh" hreflang="zh" />
+    <link rel="alternate" href="/" hreflang="x-default" />
+  </head>
+  <body>
+    <div class="layout">
+      <Header />
+      <main class="main">
+        <slot />
+      </main>
+      <Footer />
+    </div>
+    <style is:global>
+      :root {
+        --header-height: 4rem;
+      }
+
+      .layout {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        background: var(--color-background);
+      }
+
+      .main {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+      }
+
+      /* Reset some default styles */
+      body {
+        margin: 0;
+        padding: 0;
+        background: var(--color-background);
+        color: var(--color-text);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+
+      /* Remove default margin from headings */
+      h1,
+      h2,
+      h3,
+      h4,
+      h5,
+      h6 {
+        margin: 0;
+      }
+
+      /* Ensure footer sticks to bottom */
+      footer {
+        margin-top: auto;
+      }
+    </style>
+  </body>
 </html>

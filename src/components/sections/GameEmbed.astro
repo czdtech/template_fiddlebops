@@ -1,132 +1,529 @@
 ---
-import { Image } from 'astro:assets';
-import type { ImageMetadata } from 'astro';
-import gamePreview from '/src/assets/FiddleBops.webp';
-import ErrorBoundary from '../ErrorBoundary.astro';
+import { siteConfig } from "@/config/site";
+import { getLangFromUrl, useTranslations } from "@/i18n/utils";
+import ScreenReader from "@/components/a11y/ScreenReader.astro";
 
-interface Props {}
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+// 游戏预览图片路径
+const previewImage = "/images/FiddleBops.webp";
 ---
 
-<section id="play-fiddlebops" class="mb-16">
-  <ErrorBoundary fallback="游戏加载失败，请检查网络连接后重试" />
-  <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "VideoGame",
-      "name": "FiddleBops",
-      "description": "一款由粉丝创作的音乐创作游戏",
-      "image": "/src/assets/FiddleBops.webp",
-      "url": "https://silkycell.github.io/FiddleBops/",
-      "genre": "音乐游戏",
-      "gamePlatform": "Web Browser",
-      "applicationCategory": "Game",
-      "interactionType": "UserConsent"
-    }
-  </script>
-  <h2 class="text-3xl font-bold font-display text-secondary mb-8 text-center">立即畅玩</h2>
-  <div class="relative w-full max-w-4xl mx-auto">
-    <div id="iframe-placeholder" class="absolute inset-0 flex justify-center items-center z-10">
-      <div class="absolute inset-0 backdrop-blur-sm">
-        <Image 
-          src={gamePreview}
-          alt="FiddleBops 游戏预览"
-          class="w-full h-full object-cover"
-          format="webp"
-        />
-        <div class="absolute inset-0 bg-gradient-to-t from-primary/80 via-background/50 to-background/80"></div>
+<section
+  id="game"
+  class="game-section"
+  role="region"
+  aria-labelledby="game-title"
+>
+  <div class="container">
+    <div class="game-container">
+      <div class="game-cover" data-visible="true">
+        <div
+          class="cover-background"
+          style={`background-image: url(${previewImage})`}
+        >
+        </div>
+        <div class="cover-overlay"></div>
+        <div class="cover-content">
+          <h2 class="cover-title">{t("game.frameTitle")}</h2>
+          <p class="cover-description">{t("game.frameDescription")}</p>
+          <button class="start-button" aria-label={t("nav.startGame")}>
+            <span>{t("nav.startGame")}</span>
+            <svg
+              class="play-icon"
+              viewBox="0 0 24 24"
+              width="24"
+              height="24"
+              aria-hidden="true"
+            >
+              <path fill="currentColor" d="M8 5v14l11-7z"></path>
+            </svg>
+          </button>
+        </div>
       </div>
-      <button 
-        id="play-button" 
-        aria-label="开始游戏"
-        class="relative z-20 bg-accent hover:bg-accent-dark text-text-light font-bold py-4 px-8 rounded-full shadow-lg transform hover:scale-105 transition-all duration-300 text-lg border-2 border-text-light/20 hover:border-text-light/40 pulse-animation">
-        开始游戏
-      </button>
-    </div>
-    <div id="iframe-container" class="relative">
-      <iframe
-        id="fiddlebops-iframe"
-        data-src="https://silkycell.github.io/FiddleBops/"
-        title="FiddleBops Game"
-        allowfullscreen
-        class="w-full aspect-video border-4 border-primary rounded-lg shadow-xl"
-      ></iframe>
+
+      <div
+        class="game-wrapper"
+        role="application"
+        aria-label={t("game.frameTitle")}
+      >
+        <div class="game-instructions" aria-hidden="true">
+          <p class="loading-text">{t("game.loading")}</p>
+        </div>
+        <iframe
+          data-src="https://silkycell.github.io/FiddleBops/"
+          title={t("game.frameTitle")}
+          class="game-frame"
+          tabindex="0"
+          allow="autoplay"
+          aria-label={t("game.frameDescription")}></iframe>
+      </div>
+
+      <div class="game-controls" aria-label={t("game.controls")}>
+        <button
+          class="skip-game"
+          onclick="document.querySelector('#features').focus()"
+        >
+          {t("game.skipGame")}
+        </button>
+
+        <div class="game-instructions-text">
+          <h3>{t("game.instructions.title")}</h3>
+          <div class="instructions-grid">
+            <div class="instruction-block">
+              <h4>🎮 {lang === "zh" ? "创作方式" : "How to Create"}</h4>
+              <ul>
+                <li>{t("game.instructions.drag")}</li>
+                <li>{t("game.instructions.mix")}</li>
+                <li>{t("game.instructions.create")}</li>
+              </ul>
+            </div>
+            <div class="instruction-block">
+              <h4>🎼 {lang === "zh" ? "音效类别" : "Sound Categories"}</h4>
+              <ul>
+                <li>{t("game.category.beats")}</li>
+                <li>{t("game.category.effects")}</li>
+                <li>{t("game.category.melodies")}</li>
+                <li>{t("game.category.voices")}</li>
+              </ul>
+            </div>
+            <div class="instruction-block">
+              <h4>💫 {lang === "zh" ? "操作方式" : "Controls"}</h4>
+              <ul>
+                <li>{t("game.instructions.desktop")}</li>
+                <li>{t("game.instructions.mobile")}</li>
+                <li>{t("game.instructions.unlock")}</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
+  <ScreenReader id="game-announcer" />
 </section>
 
 <style>
-  @keyframes pulse {
-    0%, 100% {
-      box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4);
+  .game-section {
+    padding: 2rem 0;
+    background: var(--color-background);
+  }
+
+  .container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+  }
+
+  .game-container {
+    position: relative;
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    background: var(--color-background-light);
+    border-radius: 1rem;
+    overflow: hidden;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  }
+
+  .game-wrapper {
+    position: relative;
+    width: 100%;
+    padding-top: 56.25%; /* 16:9 Aspect Ratio */
+    border-radius: 0.5rem 0.5rem 0 0; /* 只给上方圆角 */
+    overflow: hidden; /* 确保内容不超出圆角 */
+    background: rgba(26, 26, 26, 0.7); /* 调整为更透明的背景色 */
+  }
+
+  .game-frame {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+    background: transparent; /* 确保iframe背景透明 */
+  }
+
+  .game-frame:focus {
+    outline: 3px solid var(--color-primary);
+    outline-offset: -3px;
+  }
+
+  .game-instructions {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    z-index: 1;
+    color: var(--color-text-muted);
+  }
+
+  .loading-text {
+    font-size: 1.125rem;
+    color: var(--color-text-muted);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  }
+
+  .game-controls {
+    padding: 1.5rem;
+    background: var(--color-background-lighter);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .skip-game {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
+
+  .skip-game:focus {
+    position: static;
+    width: auto;
+    height: auto;
+    padding: 0.5rem 1rem;
+    margin-bottom: 1rem;
+    background: var(--color-primary);
+    color: white;
+    border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+  }
+
+  .game-instructions-text {
+    color: var(--color-text-muted);
+  }
+
+  .game-instructions-text h3 {
+    margin-bottom: 1rem;
+    color: var(--color-text);
+    font-size: 1.25rem;
+    text-align: center;
+  }
+
+  .game-instructions-text h4 {
+    color: var(--color-text);
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .instructions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1rem;
+  }
+
+  .instruction-block {
+    background: var(--color-background);
+    padding: 1rem;
+    border-radius: 0.5rem;
+    border: 1px solid var(--color-border);
+  }
+
+  .instruction-block ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  .instruction-block li {
+    position: relative;
+    padding-left: 1.25rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+    line-height: 1.4;
+  }
+
+  .instruction-block li::before {
+    content: "•";
+    position: absolute;
+    left: 0;
+    color: var(--color-primary);
+  }
+
+  /* 游戏封面样式 */
+  .game-cover {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    /* 高度设置为与game-wrapper相同 */
+    padding-top: 56.25%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+    opacity: 1;
+    visibility: visible;
+    overflow: hidden;
+    border-radius: 0.5rem 0.5rem 0 0;
+    /* 移除默认过渡效果，只在隐藏时添加 */
+    transform: none;
+  }
+
+  .cover-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    filter: blur(8px);
+    transform: scale(1.1);
+    z-index: 1;
+  }
+
+  .cover-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      to bottom right,
+      rgba(0, 0, 0, 0.75),
+      rgba(0, 0, 0, 0.85)
+    );
+    z-index: 2;
+  }
+
+  .cover-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color: white;
+    padding: 2rem;
+    max-width: 600px;
+    z-index: 3;
+    /* 移除默认动画，改为使用 CSS 类控制 */
+    opacity: 1;
+    transition: transform 0.3s ease-out;
+  }
+
+  .cover-title {
+    font-size: clamp(1.5rem, 4vw, 2.5rem);
+    font-weight: bold;
+    margin-bottom: 1rem;
+    line-height: 1.2;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .cover-description {
+    font-size: clamp(1rem, 2vw, 1.125rem);
+    margin-bottom: 2rem;
+    opacity: 0.9;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  }
+
+  .start-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--color-primary);
+    background: white;
+    border: none;
+    border-radius: 9999px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .start-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .start-button:focus-visible {
+    outline: 2px solid white;
+    outline-offset: 2px;
+  }
+
+  .play-icon {
+    transition: transform 0.2s ease;
+  }
+
+  .start-button:hover .play-icon {
+    transform: translateX(2px);
+  }
+
+  @media (max-width: 768px) {
+    .game-section {
+      padding: 1.5rem 0;
     }
-    50% {
-      box-shadow: 0 0 0 15px rgba(255, 255, 255, 0);
+
+    .game-container {
+      border-radius: 0.75rem;
+    }
+
+    .game-instructions-text h3 {
+      font-size: 1.125rem;
+    }
+
+    .instructions-grid {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+
+    .instruction-block {
+      padding: 0.875rem;
+    }
+
+    .instruction-block h4 {
+      font-size: 0.875rem;
+    }
+
+    .instruction-block li {
+      font-size: 0.75rem;
+      margin-bottom: 0.375rem;
     }
   }
-  
-  .pulse-animation {
-    animation: pulse 2s infinite;
+
+  @media (max-width: 480px) {
+    .game-section {
+      padding: 1rem 0;
+    }
+
+    .game-container {
+      border-radius: 0.5rem;
+    }
+
+    .cover-title {
+      font-size: 1.25rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .cover-description {
+      font-size: 0.875rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .start-button {
+      padding: 0.5rem 1rem;
+      font-size: 0.875rem;
+    }
+
+    .game-instructions-text {
+      padding: 0.75rem;
+    }
+  }
+
+  .game-cover[data-visible="false"] {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: all 0.3s ease-out; /* 只在隐藏时添加过渡效果 */
+  }
+
+  .game-cover[data-visible="false"] .cover-background {
+    transform: scale(1.2);
+    transition: transform 0.5s ease-out;
+  }
+
+  .game-cover[data-visible="false"] .cover-content {
+    transform: translate(-50%, -40%);
+    opacity: 0;
+    transition: all 0.3s ease-out;
   }
 </style>
 
 <script>
-type DOMEvent = Event & { 
-  currentTarget: EventTarget & HTMLElement;
-};
+  class GameEmbedController {
+    private frame: HTMLIFrameElement;
+    private announcer: HTMLElement;
+    private loadingText: HTMLElement;
+    private gameCover: HTMLElement;
+    private startButton: HTMLButtonElement;
 
-document.addEventListener('DOMContentLoaded', () => {
-  try {
-    const playButton = document.getElementById('play-button');
-    const iframePlaceholder = document.getElementById('iframe-placeholder');
-    const fiddlebopsIframe = document.getElementById('fiddlebops-iframe');
-
-    if (!playButton || !iframePlaceholder || !fiddlebopsIframe) {
-      throw new Error('页面元素加载失败');
+    constructor() {
+      this.frame = document.querySelector(".game-frame") as HTMLIFrameElement;
+      this.announcer = document.querySelector("#game-announcer") as HTMLElement;
+      this.loadingText = document.querySelector(".loading-text") as HTMLElement;
+      this.gameCover = document.querySelector(".game-cover") as HTMLElement;
+      this.startButton = document.querySelector(
+        ".start-button"
+      ) as HTMLButtonElement;
+      this.init();
     }
 
-    const setIframeHeight = (): void => {
-      if (fiddlebopsIframe instanceof HTMLIFrameElement) {
-        const width = fiddlebopsIframe.offsetWidth;
-        const height = (width * 9) / 16;
-        fiddlebopsIframe.style.height = `${height}px`;
-      }
-    };
+    private init() {
+      this.setupStartButton();
+      this.setupKeyboardNavigation();
+    }
 
-    window.addEventListener('resize', setIframeHeight);
-    setIframeHeight();
+    private setupStartButton() {
+      this.startButton.addEventListener("click", () => {
+        this.startGame();
+      });
 
-    playButton.addEventListener('click', () => {
-      try {
-        if (iframePlaceholder instanceof HTMLElement) {
-          iframePlaceholder.style.opacity = '0';
-          iframePlaceholder.style.pointerEvents = 'none';
+      this.startButton.addEventListener("keydown", (e: KeyboardEvent) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          this.startGame();
         }
-        
-        if (fiddlebopsIframe instanceof HTMLIFrameElement) {
-          const dataSrc = fiddlebopsIframe.dataset.src;
-          if (!dataSrc) {
-            throw new Error('游戏源地址未设置');
+      });
+    }
+
+    private startGame() {
+      // 显示加载提示
+      this.loadingText.style.display = "block";
+      (this.announcer as any)?.announce?.(
+        "游戏正在加载中，请稍候...",
+        "polite"
+      );
+
+      // 隐藏封面
+      this.gameCover.setAttribute("data-visible", "false");
+
+      // 设置游戏 URL
+      const gameUrl = this.frame.getAttribute("data-src");
+      if (gameUrl) {
+        this.frame.src = gameUrl;
+      }
+
+      // 监听游戏加载完成
+      this.frame.addEventListener("load", () => {
+        this.loadingText.style.display = "none";
+        (this.announcer as any)?.announce?.(
+          "游戏已加载完成，可以开始创作音乐。使用鼠标或触摸屏拖放音效图标到角色身上。",
+          "polite"
+        );
+      });
+    }
+
+    private setupKeyboardNavigation() {
+      this.frame.addEventListener("keydown", (e: KeyboardEvent) => {
+        if (e.key === "Tab") {
+          if (!e.shiftKey) {
+            const instructions = document.querySelector(
+              ".game-instructions-text"
+            );
+            if (instructions) {
+              e.preventDefault();
+              (instructions as HTMLElement).focus();
+            }
           }
-          fiddlebopsIframe.src = dataSrc;
-          fiddlebopsIframe.onerror = () => {
-            throw new Error('游戏加载失败，请检查网络连接');
-          };
-          fiddlebopsIframe.focus();
         }
-      } catch (error) {
-        if (error instanceof Error) {
-          window.showError(error.message);
-        } else {
-          window.showError('发生了未知错误');
-        }
-      }
-    });
-  } catch (error) {
-    if (error instanceof Error) {
-      window.showError(error.message);
-    } else {
-      window.showError('发生了未知错误');
+      });
+
+      this.frame.addEventListener("focus", () => {
+        (this.announcer as any)?.announce?.(
+          "游戏区域已激活，可以使用鼠标或触摸屏进行音乐创作",
+          "polite"
+        );
+      });
     }
   }
-});
-</script> 
+
+  // 初始化控制器
+  new GameEmbedController();
+</script>

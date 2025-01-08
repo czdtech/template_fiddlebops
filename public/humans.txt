@@ -1,0 +1,11 @@
+/* TEAM */
+Developer: FiddleBops Team
+Site: https://fiddlebops.com
+Twitter: @fiddlebops
+Location: Global
+
+/* SITE */
+Last update: 2024/01/01
+Standards: HTML5, CSS3, JavaScript
+Components: Astro, Tailwind CSS
+Software: VS Code, Git 

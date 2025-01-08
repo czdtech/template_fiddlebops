@@ -1,50 +1,336 @@
 ---
-type Feature = {
-  icon: string;
-  title: string;
-  description: string;
-};
+import { getLangFromUrl, useTranslations } from "@/i18n/utils";
+import ScreenReader from "@/components/a11y/ScreenReader.astro";
 
-const features: Feature[] = [
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+const features = [
   {
-    icon: "hand-pointer",
-    title: "直观的界面",
-    description: "用户友好的拖放界面，简化音乐创作过程。"
+    icon: "🎮",
+    title: t("features.gameplay.title"),
+    description: t("features.gameplay.description"),
   },
   {
-    icon: "user-friends",
-    title: "独特的角色",
-    description: "多种粉丝创作的角色可供选择，每个角色都有自己独特的声音和个性。"
+    icon: "🎵",
+    title: t("features.music.title"),
+    description: t("features.music.description"),
   },
   {
-    icon: "music",
-    title: "声音混合",
-    description: "鼓励尝试不同的角色组合，解锁隐藏的旋律，创作原创作品。"
+    icon: "⚡",
+    title: t("features.feedback.title"),
+    description: t("features.feedback.description"),
   },
   {
-    icon: "users",
-    title: "社区互动",
-    description: "建立活跃的社区，玩家可以在这里分享作品，探索他人的作品，并参与挑战。"
+    icon: "📈",
+    title: t("features.difficulty.title"),
+    description: t("features.difficulty.description"),
   },
-  {
-    icon: "sync-alt",
-    title: "定期更新",
-    description: "根据社区反馈，不断更新新的角色、声音和功能。"
-  }
 ];
 ---
 
-<section class="mb-16 py-12 rounded-lg">
-  <div class="container mx-auto px-4 text-center">
-    <h2 class="text-3xl font-bold font-display text-accent mb-8">核心功能</h2>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-      {features.map(feature => (
-        <div class="bg-card hover:bg-card-hover backdrop-blur-sm rounded-lg p-6 transition-all duration-300">
-          <i class={`fas fa-${feature.icon} text-4xl text-accent mb-4`}></i>
-          <h3 class="font-bold text-xl mb-2 text-secondary">{feature.title}</h3>
-          <p class="text-text">{feature.description}</p>
-        </div>
-      ))}
+<section id="features" class="features" aria-labelledby="features-title">
+  <div class="container">
+    <h2 id="features-title" class="section-title">
+      <span class="gradient-text">{t("features.title")}</span>
+    </h2>
+    <div class="features-grid" role="list" aria-label={t("features.title")}>
+      {
+        features.map((feature, index) => (
+          <div
+            class="feature-card"
+            role="listitem"
+            tabindex="0"
+            data-index={index}
+          >
+            <div class="feature-icon" role="img" aria-label={feature.title}>
+              {feature.icon}
+            </div>
+            <h3 id={`feature-title-${index}`}>{feature.title}</h3>
+            <p aria-labelledby={`feature-title-${index}`}>
+              {feature.description}
+            </p>
+          </div>
+        ))
+      }
     </div>
   </div>
-</section> 
+  <ScreenReader id="features-announcer" />
+</section>
+
+<style>
+  .features {
+    padding: 3rem 0;
+    background: var(--color-background);
+  }
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+  }
+
+  .section-title {
+    text-align: center;
+    font-size: clamp(1.75rem, 4vw, 2.5rem);
+    margin-bottom: 2rem;
+    font-weight: bold;
+  }
+
+  .gradient-text {
+    background: linear-gradient(
+      135deg,
+      var(--color-primary) 0%,
+      var(--color-accent) 100%
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    position: relative;
+  }
+
+  .gradient-text::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 3px;
+    background: var(--color-primary);
+    border-radius: 3px;
+  }
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin: 0 auto;
+    max-width: 1200px;
+    padding: 0 1rem;
+  }
+
+  .feature-card {
+    background: var(--color-background-light);
+    border-radius: 1rem;
+    padding: 2rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    opacity: 0;
+    transform: translateY(20px);
+    outline: none;
+  }
+
+  .feature-card:hover,
+  .feature-card:focus-visible {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  }
+
+  .feature-card:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+
+  .feature-card[data-animate="true"] {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .feature-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    display: inline-block;
+  }
+
+  .feature-card h3 {
+    color: var(--color-text);
+    font-size: 1.25rem;
+    margin-bottom: 0.75rem;
+    font-weight: 600;
+  }
+
+  .feature-card p {
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+    line-height: 1.6;
+  }
+
+  @media (max-width: 768px) {
+    .features {
+      padding: 3rem 0;
+    }
+
+    .section-title {
+      font-size: clamp(1.5rem, 5vw, 2rem);
+      margin-bottom: 2rem;
+    }
+
+    .features-grid {
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.25rem;
+      padding: 0 1rem;
+    }
+
+    .feature-card {
+      padding: 1.5rem;
+    }
+
+    .feature-icon {
+      font-size: 2rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .feature-card h3 {
+      font-size: 1.125rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .feature-card p {
+      font-size: 0.875rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .features {
+      padding: 2rem 0;
+    }
+
+    .section-title {
+      font-size: clamp(1.25rem, 4vw, 1.75rem);
+      margin-bottom: 1.5rem;
+    }
+
+    .features-grid {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+      padding: 0 0.75rem;
+    }
+
+    .feature-card {
+      padding: 1.25rem;
+    }
+
+    .feature-icon {
+      font-size: 1.75rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .feature-card h3 {
+      font-size: 1rem;
+    }
+
+    .feature-card p {
+      font-size: 0.8125rem;
+      line-height: 1.5;
+    }
+  }
+</style>
+
+<script>
+  class FeaturesController {
+    private cards: HTMLElement[];
+    private announcer: HTMLElement;
+
+    constructor() {
+      this.cards = Array.from(document.querySelectorAll(".feature-card"));
+      this.announcer = document.querySelector(
+        "screen-reader-announcer"
+      ) as HTMLElement;
+      this.init();
+    }
+
+    private init() {
+      this.setupAnimations();
+      this.setupKeyboardNavigation();
+      this.setupCardInteractions();
+    }
+
+    private setupAnimations() {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              const card = entry.target as HTMLElement;
+              const delay = parseInt(card.dataset.index || "0") * 100;
+              setTimeout(() => {
+                card.dataset.animate = "true";
+              }, delay);
+              observer.unobserve(card);
+            }
+          });
+        },
+        { threshold: 0.2 }
+      );
+
+      this.cards.forEach((card) => observer.observe(card));
+    }
+
+    private setupKeyboardNavigation() {
+      this.cards.forEach((card, index) => {
+        card.addEventListener("keydown", (e: KeyboardEvent) => {
+          switch (e.key) {
+            case "ArrowRight":
+            case "ArrowDown":
+              e.preventDefault();
+              this.focusNext(index);
+              break;
+            case "ArrowLeft":
+            case "ArrowUp":
+              e.preventDefault();
+              this.focusPrevious(index);
+              break;
+            case "Home":
+              e.preventDefault();
+              this.focusFirst();
+              break;
+            case "End":
+              e.preventDefault();
+              this.focusLast();
+              break;
+          }
+        });
+      });
+    }
+
+    private setupCardInteractions() {
+      this.cards.forEach((card) => {
+        card.addEventListener("focus", () => {
+          const title = card.querySelector("h3")?.textContent;
+          const description = card.querySelector("p")?.textContent;
+          if (title && description) {
+            (this.announcer as any)?.announce?.(
+              `${title}: ${description}`,
+              "polite"
+            );
+          }
+        });
+      });
+    }
+
+    private focusNext(currentIndex: number) {
+      const nextIndex =
+        currentIndex < this.cards.length - 1 ? currentIndex + 1 : 0;
+      this.cards[nextIndex].focus();
+    }
+
+    private focusPrevious(currentIndex: number) {
+      const prevIndex =
+        currentIndex > 0 ? currentIndex - 1 : this.cards.length - 1;
+      this.cards[prevIndex].focus();
+    }
+
+    private focusFirst() {
+      this.cards[0].focus();
+    }
+
+    private focusLast() {
+      this.cards[this.cards.length - 1].focus();
+    }
+  }
+
+  // 初始化Features控制器
+  new FeaturesController();
+</script>

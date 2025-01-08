@@ -1,0 +1,44 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import Hero from '../components/Hero.astro';
+import GameEmbed from '../components/GameEmbed.astro';
+import Features from '../components/Features.astro';
+import FAQ from '../components/FAQ.astro';
+import { Image } from 'astro:assets';
+import gamePreview from '/src/assets/FiddleBops.webp';
+import GamePreview from '../components/GamePreview.astro';
+---
+
+<BaseLayout 
+  title="FiddleBops - 释放你的音乐创造力" 
+  description="体验 FiddleBops，一款由粉丝创作的独特音乐游戏。"
+>
+  <Header />
+  <main class="container mx-auto px-4 py-16 space-y-32">
+    <Hero />
+    <GameEmbed />
+    <Features />
+    <FAQ />
+    <section class="mb-16">
+      <h2 class="text-3xl sm:text-4xl font-bold font-display text-primary mb-12 text-center">
+        视觉展示
+      </h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
+        <GamePreview
+          src={gamePreview}
+          alt="FiddleBops 游戏界面展示"
+          loading="eager"
+          className="border-accent"
+        />
+        <GamePreview
+          src={gamePreview}
+          alt="FiddleBops 游戏界面展示"
+          className="border-secondary"
+        />
+      </div>
+    </section>
+  </main>
+  <Footer />
+</BaseLayout>

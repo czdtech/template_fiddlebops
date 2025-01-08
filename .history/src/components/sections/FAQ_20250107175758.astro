@@ -1,0 +1,67 @@
+---
+import { faqs } from '../../data/faqs';
+---
+
+<section>
+  <h2 class="text-3xl font-bold font-display text-accent mb-12 text-center">
+    常见问题
+  </h2>
+
+  <div class="container mx-auto px-4">
+    <div class="max-w-3xl mx-auto space-y-6">
+      {
+        faqs.map((faq, index) => (
+          <div class="bg-card hover:bg-card-hover backdrop-blur-sm rounded-xl transition-standard">
+            <button
+              class="w-full p-6 sm:p-8 flex justify-between items-center gap-6 text-left group"
+            >
+              <span class="font-bold text-lg sm:text-xl text-secondary group-hover:text-accent transition-standard">
+                {faq.question}
+              </span>
+              <svg
+                class="w-6 h-6 flex-shrink-0 transition-transform duration-300"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
+            </button>
+
+            <div
+              id={`faq-answer-${index}`}
+              class="hidden p-6 sm:p-8 pt-0 text-text prose prose-sm sm:prose-base prose-secondary max-w-none"
+            >
+              <p>{faq.answer}</p>
+            </div>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const buttons = document.querySelectorAll("button[aria-controls]");
+    
+    buttons.forEach((button) => {
+      button.addEventListener("click", () => {
+        const isExpanded = button.getAttribute("aria-expanded") === "true";
+        const answerId = button.getAttribute("aria-controls");
+        const answer = document.getElementById(answerId!);
+        const icon = button.querySelector("svg");
+
+        button.setAttribute("aria-expanded", (!isExpanded).toString());
+        answer?.classList.toggle("hidden");
+        icon?.classList.toggle("rotate-180");
+      });
+    });
+  });
+</script> 

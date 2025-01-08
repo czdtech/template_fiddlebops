@@ -1,66 +1,312 @@
 ---
-type FAQ = {
-  question: string;
-  answer: string;
-};
+import { siteConfig } from "@/config/site";
+import { getLangFromUrl, useTranslations } from "@/i18n/utils";
+import ScreenReader from "@/components/a11y/ScreenReader.astro";
 
-const faqs: FAQ[] = [
-  {
-    question: "什么是 FiddleBops？",
-    answer: "FiddleBops 是一款富有创意的音乐制作游戏，玩家可以通过混合独特的角色声音来创作原创作品。"
-  },
-  {
-    question: "我需要下载任何东西才能玩吗？",
-    answer: "不需要，FiddleBops 直接在您的 Web 浏览器中运行，无需下载或安装。"
-  },
-  {
-    question: "如何开始创作音乐？",
-    answer: "只需将角色拖到舞台上，即可将他们的声音添加到您的组合中。尝试不同的组合以获得独特的曲目。"
-  },
-  {
-    question: "我可以保存我的作品吗？",
-    answer: "是的，玩家可以保存他们的作品并在社区中与他人分享。"
-  },
-  {
-    question: "FiddleBops 可以免费玩吗？",
-    answer: "是的，这款游戏在 Sprunki InCrediBox 平台上完全免费。"
-  }
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+const faqs = [
+  { question: t("faq.q1"), answer: t("faq.a1") },
+  { question: t("faq.q2"), answer: t("faq.a2") },
+  { question: t("faq.q3"), answer: t("faq.a3") },
+  { question: t("faq.q4"), answer: t("faq.a4") },
+  { question: t("faq.q5"), answer: t("faq.a5") },
+  { question: t("faq.q6"), answer: t("faq.a6") },
+  { question: t("faq.q7"), answer: t("faq.a7") },
+  { question: t("faq.q8"), answer: t("faq.a8") },
 ];
 ---
 
-<section id="faq" class="mb-16">
-  <h2 class="text-3xl font-bold font-display text-accent mb-8 text-center">常见问题</h2>
-  <div class="space-y-4">
-    {faqs.map((faq, index) => (
-      <div class="group" x-data="{ open: false }">
-        <button
-          class="w-full bg-card hover:bg-card-hover backdrop-blur-sm rounded-lg p-6 transition-all duration-300 flex justify-between items-center"
-          @click="open = !open"
-          aria-expanded="false"
-          :aria-expanded="open"
-          aria-controls={`faq-answer-${index}`}
-        >
-          <h3 class="font-bold text-xl text-secondary text-left">{faq.question}</h3>
-          <svg 
-            class="w-6 h-6 transform transition-transform duration-300" 
-            :class="open ? 'rotate-180' : ''"
-            xmlns="http://www.w3.org/2000/svg" 
-            fill="none" 
-            viewBox="0 0 24 24" 
-            stroke="currentColor"
-          >
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-          </svg>
-        </button>
-        <div 
-          id={`faq-answer-${index}`}
-          x-show="open"
-          x-collapse
-          class="text-text p-6 bg-card/50 rounded-b-lg mt-1"
-        >
-          <p>{faq.answer}</p>
-        </div>
-      </div>
-    ))}
+<section id="faq" class="faq-section" aria-labelledby="faq-title">
+  <div class="container">
+    <div class="faq-header">
+      <h2 id="faq-title">{t("faq.title")}</h2>
+      <p id="faq-description">{t("faq.subtitle")}</p>
+    </div>
+    <div
+      class="faq-grid"
+      role="region"
+      aria-labelledby="faq-title"
+      aria-describedby="faq-description"
+    >
+      {
+        faqs.map((faq, index) => (
+          <details class="faq-item">
+            <summary
+              role="button"
+              aria-expanded="false"
+              aria-controls={`faq-answer-${index}`}
+            >
+              <span class="faq-question">{faq.question}</span>
+              <span class="faq-icon" aria-hidden="true" />
+            </summary>
+            <div
+              id={`faq-answer-${index}`}
+              class="faq-answer"
+              role="region"
+              aria-labelledby={`faq-question-${index}`}
+            >
+              <p>{faq.answer}</p>
+            </div>
+          </details>
+        ))
+      }
+    </div>
   </div>
-</section> 
+  <ScreenReader id="faq-announcer" />
+</section>
+
+<style>
+  .faq-section {
+    padding: 4rem 0 6rem;
+    background: var(--color-background);
+    margin-bottom: 0;
+  }
+
+  .container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+  }
+
+  .faq-header {
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+
+  .faq-header h2 {
+    font-size: clamp(2rem, 4vw, 3rem);
+    margin-bottom: 1rem;
+    background: linear-gradient(
+      to right,
+      var(--color-primary),
+      var(--color-accent)
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .faq-header p {
+    font-size: clamp(1rem, 2vw, 1.25rem);
+    color: var(--color-text-muted);
+  }
+
+  .faq-grid {
+    max-width: 800px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    padding: 0 1rem;
+  }
+
+  .faq-item {
+    background: var(--color-background-light);
+    border-radius: 0.5rem;
+    overflow: hidden;
+    border: 1px solid var(--color-border);
+  }
+
+  .faq-item summary {
+    padding: 1.5rem;
+    cursor: pointer;
+    position: relative;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    outline: none;
+    background: var(--color-background-light);
+  }
+
+  .faq-item summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .faq-item summary:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+
+  .faq-question {
+    font-weight: 500;
+    color: var(--color-text);
+    flex: 1;
+  }
+
+  .faq-icon {
+    width: 20px;
+    height: 20px;
+    position: relative;
+    flex-shrink: 0;
+  }
+
+  .faq-icon::before,
+  .faq-icon::after {
+    content: "";
+    position: absolute;
+    background: var(--color-primary);
+    border-radius: 2px;
+  }
+
+  .faq-icon::before {
+    width: 2px;
+    height: 20px;
+    left: 9px;
+    top: 0;
+  }
+
+  .faq-icon::after {
+    width: 20px;
+    height: 2px;
+    left: 0;
+    top: 9px;
+  }
+
+  .faq-item[open] .faq-icon::before {
+    display: none;
+  }
+
+  .faq-answer {
+    padding: 0 1.5rem 1.5rem;
+    color: var(--color-text-muted);
+    line-height: 1.6;
+    background: var(--color-background-light);
+  }
+
+  @media (max-width: 768px) {
+    .faq-section {
+      padding: 3rem 0 4rem;
+    }
+
+    .faq-header {
+      margin-bottom: 2rem;
+    }
+
+    .faq-header h2 {
+      font-size: clamp(1.5rem, 5vw, 2rem);
+    }
+
+    .faq-header p {
+      font-size: clamp(0.875rem, 2vw, 1rem);
+      padding: 0 1rem;
+    }
+
+    .faq-grid {
+      padding: 0 0.75rem;
+    }
+
+    .faq-item summary {
+      padding: 1.25rem;
+    }
+
+    .faq-question {
+      font-size: 0.9375rem;
+    }
+
+    .faq-answer {
+      padding: 0 1.25rem 1.25rem;
+      font-size: 0.875rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .faq-section {
+      padding: 2rem 0 3rem;
+    }
+
+    .faq-header {
+      margin-bottom: 2rem;
+    }
+
+    .faq-header h2 {
+      font-size: clamp(1.25rem, 4vw, 1.75rem);
+    }
+
+    .faq-grid {
+      padding: 0 0.75rem;
+    }
+
+    .faq-item summary {
+      padding: 1rem;
+    }
+
+    .faq-question {
+      font-size: 0.875rem;
+    }
+
+    .faq-answer {
+      padding: 0 1rem 1rem;
+      font-size: 0.8125rem;
+    }
+  }
+</style>
+
+<script>
+  class FAQController {
+    private items: HTMLDetailsElement[];
+
+    constructor() {
+      this.items = Array.from(document.querySelectorAll(".faq-item"));
+      this.init();
+    }
+
+    private init() {
+      this.setupKeyboardNavigation();
+    }
+
+    private setupKeyboardNavigation() {
+      this.items.forEach((item, index) => {
+        const summary = item.querySelector("summary");
+        if (summary) {
+          summary.addEventListener("keydown", (e: KeyboardEvent) => {
+            switch (e.key) {
+              case "ArrowDown":
+                e.preventDefault();
+                this.focusNext(index);
+                break;
+              case "ArrowUp":
+                e.preventDefault();
+                this.focusPrevious(index);
+                break;
+              case "Home":
+                e.preventDefault();
+                this.focusFirst();
+                break;
+              case "End":
+                e.preventDefault();
+                this.focusLast();
+                break;
+            }
+          });
+        }
+      });
+    }
+
+    private focusNext(currentIndex: number) {
+      const nextIndex =
+        currentIndex < this.items.length - 1 ? currentIndex + 1 : 0;
+      this.items[nextIndex].querySelector("summary")?.focus();
+    }
+
+    private focusPrevious(currentIndex: number) {
+      const prevIndex =
+        currentIndex > 0 ? currentIndex - 1 : this.items.length - 1;
+      this.items[prevIndex].querySelector("summary")?.focus();
+    }
+
+    private focusFirst() {
+      this.items[0].querySelector("summary")?.focus();
+    }
+
+    private focusLast() {
+      this.items[this.items.length - 1].querySelector("summary")?.focus();
+    }
+  }
+
+  // 初始化FAQ控制器
+  new FAQController();
+</script>

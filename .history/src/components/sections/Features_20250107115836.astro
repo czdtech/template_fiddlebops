@@ -1,0 +1,77 @@
+---
+import type { Feature } from '@/types';
+
+const features: Feature[] = [
+  {
+    icon: "hand-pointer",
+    title: "直观的界面",
+    description: "用户友好的拖放界面，简化音乐创作过程。",
+  },
+  {
+    icon: "user-friends",
+    title: "独特的角色",
+    description:
+      "多种粉丝创作的角色可供选择，每个角色都有自己独特的声音和个性。",
+  },
+  {
+    icon: "music",
+    title: "声音混合",
+    description: "鼓励尝试不同的角色组合，解锁隐藏的旋律，创作原创作品。",
+  },
+  {
+    icon: "users",
+    title: "社区互动",
+    description:
+      "建立活跃的社区，玩家可以在这里分享作品，探索他人的作品，并参与挑战。",
+  },
+  {
+    icon: "sync-alt",
+    title: "定期更新",
+    description: "根据社区反馈，不断更新新的角色、声音和功能。",
+  },
+];
+---
+
+<section id="features" class="mb-16 scroll-mt-20">
+  <h2 class="text-3xl font-bold font-display text-primary mb-8 text-center">
+    游戏特色
+  </h2>
+  <div class="container mx-auto px-4 text-center">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      {
+        features.map((feature) => (
+          <div class="bg-card hover:bg-card-hover backdrop-blur-sm rounded-lg p-6 transition-all duration-300">
+            <div class="relative mb-4 mx-auto feature-icon-container">
+              <i
+                class={`fas fa-${feature.icon} text-accent feature-icon`}
+                aria-hidden="true"
+              />
+            </div>
+            <h3 class="font-bold text-xl mb-2 text-secondary">
+              {feature.title}
+            </h3>
+            <p class="text-text">{feature.description}</p>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .feature-icon-container {
+    width: 48px;
+    height: 48px;
+  }
+
+  .feature-icon {
+    font-size: 32px;
+    width: 32px;
+    height: 32px;
+    line-height: 32px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+</style>

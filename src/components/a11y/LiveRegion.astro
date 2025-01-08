@@ -1,0 +1,41 @@
+---
+interface Props {
+  id?: string;
+  role?: "status" | "alert" | "log";
+  "aria-live"?: "polite" | "assertive" | "off";
+  "aria-atomic"?: boolean;
+  class?: string;
+}
+
+const {
+  id,
+  role = "status",
+  "aria-live": ariaLive = "polite",
+  "aria-atomic": ariaAtomic = true,
+  class: className = "",
+} = Astro.props;
+---
+
+<div
+  id={id}
+  role={role}
+  aria-live={ariaLive}
+  aria-atomic={ariaAtomic}
+  class:list={["sr-only", className]}
+>
+  <slot />
+</div>
+
+<style>
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+</style>

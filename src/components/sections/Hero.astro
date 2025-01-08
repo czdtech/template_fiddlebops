@@ -1,12 +1,155 @@
 ---
-type Props = Record<string, never>;
+import { siteConfig } from "@/config/site";
+import {
+  getLangFromUrl,
+  useTranslations,
+  useTranslatedPath,
+} from "@/i18n/utils";
+import ScreenReader from "@/components/a11y/ScreenReader.astro";
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const translatePath = useTranslatedPath(lang);
 ---
 
-<section class="mb-16 text-center">
-  <h1 class="text-5xl md:text-6xl font-display font-bold text-primary mb-4">
-    释放你的音乐创造力，尽在 <span class="text-accent">FiddleBops</span>！
-  </h1>
-  <p class="text-lg md:text-xl text-secondary-dark mb-8">
-    一款由粉丝创作的独特音乐游戏，灵感来源于 Incredibox，让你轻松混合声音，创作专属音乐。
-  </p>
-</section> 
+<section class="hero" aria-labelledby="hero-title" role="banner">
+  <div class="container">
+    <div class="hero-content">
+      <h1 id="hero-title" class="title">
+        <span class="gradient-text">{t("hero.title")}</span>
+      </h1>
+      <p class="description" aria-label={t("hero.description")}>
+        {t("hero.description")}
+      </p>
+    </div>
+  </div>
+  <ScreenReader id="hero-announcer" />
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 20vh;
+    padding: 1.5rem 0;
+    margin: 0;
+    background: var(--color-background-dark);
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(
+        circle at 20% 30%,
+        var(--color-primary) 0%,
+        transparent 70%
+      ),
+      radial-gradient(
+        circle at 80% 70%,
+        var(--color-accent) 0%,
+        transparent 70%
+      );
+    opacity: 0.15;
+    pointer-events: none;
+  }
+
+  .container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 1rem;
+  }
+
+  .title {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    line-height: 1.2;
+    margin-bottom: 1.5rem;
+    font-weight: 700;
+  }
+
+  .gradient-text {
+    background: linear-gradient(
+      to right,
+      var(--color-text),
+      var(--color-text-muted)
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .description {
+    font-size: clamp(1.1rem, 2vw, 1.25rem);
+    line-height: 1.6;
+    margin-bottom: 1rem;
+    color: var(--color-text-muted);
+    max-width: 540px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .hero {
+      min-height: 18vh;
+      padding: 1.25rem 0;
+    }
+
+    .hero-content {
+      padding: 0 1rem;
+    }
+
+    .title {
+      font-size: clamp(1.5rem, 6vw, 2.5rem);
+      margin-bottom: 1rem;
+    }
+
+    .description {
+      font-size: 1rem;
+      margin-bottom: 1.5rem;
+      padding: 0 1rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .hero {
+      min-height: 15vh;
+      padding: 1rem 0;
+    }
+
+    .title {
+      font-size: clamp(1.25rem, 5vw, 2rem);
+    }
+
+    .description {
+      font-size: 0.875rem;
+      padding: 0 0.5rem;
+    }
+  }
+</style>

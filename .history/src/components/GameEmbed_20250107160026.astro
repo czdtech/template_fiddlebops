@@ -1,0 +1,120 @@
+---
+import { Image } from "astro:assets";
+import gamePreview from "/src/assets/FiddleBops.webp";
+---
+
+<section class="mb-16">
+  <h2 class="text-3xl font-bold font-display text-secondary mb-8 text-center">
+    立即畅玩
+  </h2>
+  <div class="relative w-full max-w-4xl mx-auto">
+    <div
+      id="iframe-placeholder"
+      class="absolute inset-0 flex justify-center items-center z-10 transition-opacity duration-300"
+    >
+      <div class="absolute inset-0 backdrop-blur-sm">
+        <Image
+          src={gamePreview}
+          alt="FiddleBops 游戏预览"
+          loading="eager"
+          width={800}
+          height={600}
+          class="w-full h-full object-cover md:object-contain"
+          format="webp"
+        />
+        <div class="absolute inset-0 bg-gradient-to-t from-primary/80 via-background/50 to-background/80 backdrop-blur-sm md:backdrop-blur-none">
+        </div>
+      </div>
+      <button
+        id="play-button"
+        class="relative z-20 bg-accent hover:bg-accent-dark text-text-light font-bold py-4 px-8 rounded-full shadow-lg transform hover:scale-105 transition-all duration-300 text-lg border-2 border-text-light/20 hover:border-text-light/40 pulse-animation flex items-center gap-2"
+      >
+        开始游戏
+        <div id="loading-indicator" class="hidden">
+          <svg class="animate-spin h-5 w-5" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"/>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+          </svg>
+        </div>
+      </button>
+    </div>
+    <div id="iframe-container" class="relative">
+      <iframe
+        id="fiddlebops-iframe"
+        data-src="https://silkycell.github.io/FiddleBops/"
+        title="FiddleBops Game"
+        allowfullscreen
+        loading="lazy"
+        class="w-full aspect-video border-4 border-primary rounded-lg shadow-xl md:aspect-[4/3] lg:aspect-video"
+      ></iframe>
+    </div>
+  </div>
+</section>
+
+<style>
+  @keyframes pulse {
+    0%, 100% {
+      box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4);
+    }
+    50% {
+      box-shadow: 0 0 0 15px rgba(255, 255, 255, 0);
+    }
+  }
+
+  .pulse-animation {
+    animation: pulse 2s infinite;
+  }
+</style>
+
+<script>
+  let isLoading = false;
+
+  const playButton = document.getElementById("play-button");
+  const iframePlaceholder = document.getElementById("iframe-placeholder");
+  const fiddlebopsIframe = document.getElementById("fiddlebops-iframe");
+  const loadingIndicator = document.getElementById("loading-indicator");
+
+  function setLoading(loading: boolean) {
+    isLoading = loading;
+    loadingIndicator?.classList.toggle("hidden", !loading);
+  }
+
+  playButton?.addEventListener("click", async () => {
+    if (isLoading || !fiddlebopsIframe || !iframePlaceholder) return;
+    
+    try {
+      setLoading(true);
+      iframePlaceholder.style.opacity = "0";
+      iframePlaceholder.style.pointerEvents = "none";
+
+      const dataSrc = (fiddlebopsIframe as HTMLIFrameElement).dataset.src;
+      if (!dataSrc) throw new Error("游戏源地址未设置");
+
+      const timeout = setTimeout(() => {
+        if (!fiddlebopsIframe.hasAttribute("data-loaded")) {
+          throw new Error("游戏加载超时，请检查网络连接");
+        }
+      }, 30000);
+
+      (fiddlebopsIframe as HTMLIFrameElement).src = dataSrc;
+      
+      fiddlebopsIframe.addEventListener("load", () => {
+        clearTimeout(timeout);
+        setLoading(false);
+        fiddlebopsIframe.setAttribute("data-loaded", "true");
+        fiddlebopsIframe.focus();
+      });
+
+      fiddlebopsIframe.addEventListener("error", () => {
+        clearTimeout(timeout);
+        throw new Error("游戏加载失败，请检查网络连接");
+      });
+
+    } catch (error) {
+      setLoading(false);
+      iframePlaceholder.style.opacity = "1";
+      iframePlaceholder.style.pointerEvents = "auto";
+      alert(error instanceof Error ? error.message : "加载失败，请重试");
+    }
+  });
+</script> 

@@ -1,0 +1,59 @@
+/* 使用 Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Bangers&family=Nunito:wght@400;700&display=swap');
+
+@import "@fortawesome/fontawesome-free/css/all.min.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 预留图标空间 */
+.fas {
+  min-width: 1em;
+  min-height: 1em;
+  display: inline-block;
+  vertical-align: middle;
+  font-size: inherit;
+  height: 1em;
+  overflow: visible;
+  position: relative;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 4rem; /* 为固定导航栏预留空间 */
+  @screen sm {
+    scroll-padding-top: 5rem;
+  }
+}
+
+@layer base {
+  html {
+    font-size: 14px;
+    @screen sm {
+      font-size: 15px;
+    }
+    @screen md {
+      font-size: 16px;
+    }
+  }
+}
+
+/* 优化移动端的触摸滚动 */
+@supports (-webkit-touch-callout: none) {
+  .smooth-scroll {
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+@layer utilities {
+  .tap-highlight-none {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+@layer base {
+  button, a {
+    @apply tap-highlight-none;
+  }
+}

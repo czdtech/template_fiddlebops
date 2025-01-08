@@ -1,0 +1,100 @@
+---
+const navItems = [
+  {
+    href: "#play-fiddlebops",
+    text: "开始游戏",
+  },
+  {
+    href: "#features",
+    text: "游戏特色",
+  },
+  {
+    href: "#faq",
+    text: "常见问题",
+  },
+];
+---
+
+<header class="sticky top-0 bg-background-light bg-opacity-95 z-50 shadow-md">
+  <nav class="container mx-auto px-4 py-4">
+    <div class="flex justify-between items-center">
+      <a
+        href={new URL("/", Astro.site).toString()}
+        class="text-xl font-bold text-primary hover:text-primary/90 transition-colors"
+      >
+        FiddleBops
+      </a>
+
+      <button
+        type="button"
+        class="lg:hidden"
+        aria-label="切换菜单"
+        aria-expanded="false"
+        id="menu-button"
+      >
+        <span class="sr-only">打开菜单</span>
+        <svg
+          class="w-6 h-6"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M4 6h16M4 12h16M4 18h16"
+          />
+        </svg>
+      </button>
+
+      <ul class="hidden lg:flex space-x-8" id="navigation-menu">
+        {
+          navItems.map(({ href, text }) => (
+            <li>
+              <a
+                href={href}
+                class="text-text hover:text-primary transition-colors duration-200 py-2"
+              >
+                {text}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </nav>
+</header>
+
+<script>
+  const menuButton = document.getElementById("menu-button");
+  const navigationMenu = document.getElementById("navigation-menu");
+
+  if (menuButton && navigationMenu) {
+    menuButton.addEventListener("click", () => {
+      const isExpanded = menuButton.getAttribute("aria-expanded") === "true";
+      menuButton.setAttribute("aria-expanded", (!isExpanded).toString());
+      navigationMenu.classList.toggle("hidden");
+    });
+  }
+
+  // 为导航栏添加动态 padding
+  const header = document.querySelector('header');
+  const orientationNotice = document.getElementById('orientation-notice');
+
+  function updateHeaderPadding() {
+    if (header && orientationNotice) {
+      const noticeHeight = orientationNotice.classList.contains('-translate-y-full') ? 0 : orientationNotice.offsetHeight;
+      header.style.paddingTop = `${noticeHeight}px`;
+    }
+  }
+
+  // 监听提示条的显示/隐藏
+  const observer = new MutationObserver(updateHeaderPadding);
+  if (orientationNotice) {
+    observer.observe(orientationNotice, { attributes: true });
+  }
+
+  // 初始检查
+  updateHeaderPadding();
+</script> 

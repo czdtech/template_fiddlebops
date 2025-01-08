@@ -1,0 +1,111 @@
+---
+import { KeyCode } from "@/utils/a11y";
+
+interface Props {
+  id?: string;
+  role?: "navigation" | "menu" | "tablist";
+  orientation?: "horizontal" | "vertical";
+  class?: string;
+}
+
+const {
+  id,
+  role = "navigation",
+  orientation = "horizontal",
+  class: className = "",
+} = Astro.props;
+---
+
+<keyboard-nav
+  id={id}
+  role={role}
+  aria-orientation={orientation}
+  class:list={[className]}
+>
+  <slot />
+</keyboard-nav>
+
+<script>
+  import { KeyCode } from "@/utils/a11y";
+
+  class KeyboardNav extends HTMLElement {
+    items: HTMLElement[];
+
+    constructor() {
+      super();
+      this.handleKeyDown = this.handleKeyDown.bind(this);
+      this.items = Array.from(
+        this.querySelectorAll('[role="menuitem"], [role="tab"]')
+      ) as HTMLElement[];
+    }
+
+    connectedCallback() {
+      this.addEventListener("keydown", this.handleKeyDown);
+    }
+
+    disconnectedCallback() {
+      this.removeEventListener("keydown", this.handleKeyDown);
+    }
+
+    handleKeyDown(event: KeyboardEvent) {
+      const target = event.target as HTMLElement;
+      const isMenuItem = target.matches('[role="menuitem"], [role="tab"]');
+      if (!isMenuItem) return;
+
+      const currentIndex = this.items.indexOf(target);
+      let nextIndex: number;
+
+      switch (event.key) {
+        case KeyCode.LEFT:
+        case KeyCode.UP:
+          event.preventDefault();
+          nextIndex =
+            currentIndex > 0 ? currentIndex - 1 : this.items.length - 1;
+          break;
+
+        case KeyCode.RIGHT:
+        case KeyCode.DOWN:
+          event.preventDefault();
+          nextIndex =
+            currentIndex < this.items.length - 1 ? currentIndex + 1 : 0;
+          break;
+
+        case KeyCode.HOME:
+          event.preventDefault();
+          nextIndex = 0;
+          break;
+
+        case KeyCode.END:
+          event.preventDefault();
+          nextIndex = this.items.length - 1;
+          break;
+
+        default:
+          return;
+      }
+
+      const nextItem = this.items[nextIndex];
+      nextItem.focus();
+    }
+  }
+
+  customElements.define("keyboard-nav", KeyboardNav);
+</script>
+
+<style>
+  keyboard-nav:focus {
+    outline: none;
+  }
+
+  keyboard-nav :global([role="menuitem"]),
+  keyboard-nav :global([role="tab"]) {
+    outline: none;
+    cursor: pointer;
+  }
+
+  keyboard-nav :global([role="menuitem"]:focus),
+  keyboard-nav :global([role="tab"]:focus) {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+</style>

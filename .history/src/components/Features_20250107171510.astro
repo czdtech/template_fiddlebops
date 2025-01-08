@@ -1,0 +1,29 @@
+---
+import { features } from '../data/features';
+---
+
+<section>
+  <h2 class="text-3xl font-bold font-display text-primary mb-8 text-center">
+    游戏特色
+  </h2>
+  <div class="container mx-auto px-4 text-center">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+      {
+        features.map((feature) => (
+          <div class="bg-card hover:bg-card-hover backdrop-blur-sm rounded-xl p-6 sm:p-8 hover:translate-y-[-4px] transition-standard">
+            <div class="relative mb-6 mx-auto w-12 h-12 group">
+              <i
+                class={`fas fa-${feature.icon} text-accent absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-2xl group-hover:scale-110 transition-standard`}
+                aria-hidden="true"
+              />
+            </div>
+            <h3 class="font-bold text-lg sm:text-xl mb-2 text-secondary">
+              {feature.title}
+            </h3>
+            <p class="text-text">{feature.description}</p>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section> 
