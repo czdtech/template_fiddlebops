@@ -42,3 +42,27 @@ export interface NavItem {
   href: string;
   external?: boolean;
 }
+
+// 游戏配置接口
+export interface GameConfig {
+  id: string;
+  name: string;
+  description: string;
+  url: string;
+  previewImage: string;
+  orientation: "landscape" | "portrait";
+  aspectRatio: string;
+  controls: {
+    mobile: string[];
+    desktop: string[];
+  };
+  loading: {
+    message: string;
+    timeout: number;
+  };
+  seo: {
+    title: string;
+    description: string;
+    keywords: string[];
+  };
+}
