@@ -51,7 +51,9 @@ export class GameController {
     if (!this.startButton || !this.iframe || !this.error) return;
 
     // 监听开始按钮
-    this.startButton.addEventListener("click", () => this.startGame());
+    this.startButton.addEventListener("click", () => this.startGame(), {
+      passive: true,
+    });
 
     // 监听 iframe 错误
     this.iframe.addEventListener("error", () => this.handleError());
@@ -59,7 +61,9 @@ export class GameController {
     // 监听重试按钮
     const retryButton = this.error.querySelector("button");
     if (retryButton) {
-      retryButton.addEventListener("click", () => this.retry());
+      retryButton.addEventListener("click", () => this.retry(), {
+        passive: true,
+      });
     }
 
     // 监听 iframe 加载完成
