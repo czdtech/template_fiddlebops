@@ -1,14 +1,17 @@
 ---
-import { siteConfig } from "@/config/site";
 import { getLangFromUrl, useTranslations } from "@/i18n/utils";
 import ScreenReader from "@/components/a11y/ScreenReader.astro";
+import { Image } from "astro:assets";
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
 
-// 游戏预览图片路径
 const previewImage = "/images/FiddleBops.webp";
+const gameUrl = "https://silkycell.github.io/FiddleBops/";
 ---
+
+<!-- DNS 预解析 -->
+<link rel="dns-prefetch" href="https://silkycell.github.io" />
 
 <section
   id="game"
@@ -19,14 +22,19 @@ const previewImage = "/images/FiddleBops.webp";
   <div class="container">
     <div class="game-container">
       <div class="game-cover" data-visible="true">
-        <div
+        <Image
+          src={previewImage}
+          alt=""
+          width={1200}
+          height={675}
           class="cover-background"
-          style={`background-image: url(${previewImage})`}
-        >
-        </div>
-        <div class="cover-overlay"></div>
+          loading="eager"
+          quality={60}
+          format="webp"
+        />
+        <div class="cover-overlay" role="presentation"></div>
         <div class="cover-content">
-          <h2 class="cover-title">{t("game.frameTitle")}</h2>
+          <h2 id="game-title" class="cover-title">{t("game.frameTitle")}</h2>
           <p class="cover-description">{t("game.frameDescription")}</p>
           <button class="start-button" aria-label={t("nav.startGame")}>
             <span>{t("nav.startGame")}</span>
@@ -48,15 +56,26 @@ const previewImage = "/images/FiddleBops.webp";
         role="application"
         aria-label={t("game.frameTitle")}
       >
-        <div class="game-instructions" aria-hidden="true">
-          <p class="loading-text">{t("game.loading")}</p>
+        <div
+          class="error-message"
+          style="display: none;"
+          role="alert"
+          aria-live="assertive"
+        >
+          <p>{t("game.error")}</p>
+          <button class="retry-button" aria-label={t("game.retry")}>
+            {t("game.retry")}
+          </button>
         </div>
+
         <iframe
-          data-src="https://silkycell.github.io/FiddleBops/"
+          data-src={gameUrl}
           title={t("game.frameTitle")}
           class="game-frame"
           tabindex="0"
-          allow="autoplay"
+          allow="autoplay; fullscreen"
+          loading="lazy"
+          style="visibility: hidden;"
           aria-label={t("game.frameDescription")}></iframe>
       </div>
 
@@ -101,8 +120,14 @@ const previewImage = "/images/FiddleBops.webp";
       </div>
     </div>
   </div>
+
   <ScreenReader id="game-announcer" />
 </section>
+
+<script>
+  import { GameController } from "./game/GameController";
+  new GameController();
+</script>
 
 <style>
   .game-section {
@@ -120,7 +145,7 @@ const previewImage = "/images/FiddleBops.webp";
   .game-container {
     position: relative;
     width: 100%;
-    max-width: 800px;
+    max-width: 1024px;
     margin: 0 auto;
     background: var(--color-background-light);
     border-radius: 1rem;
@@ -131,10 +156,48 @@ const previewImage = "/images/FiddleBops.webp";
   .game-wrapper {
     position: relative;
     width: 100%;
-    padding-top: 56.25%; /* 16:9 Aspect Ratio */
-    border-radius: 0.5rem 0.5rem 0 0; /* 只给上方圆角 */
-    overflow: hidden; /* 确保内容不超出圆角 */
-    background: rgba(26, 26, 26, 0.7); /* 调整为更透明的背景色 */
+    padding-top: 56.25%;
+    border-radius: 0.5rem 0.5rem 0 0;
+    overflow: hidden;
+    background: rgba(26, 26, 26, 0.7);
+  }
+
+  .game-loading {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    z-index: 20;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 2rem;
+    border-radius: 1rem;
+  }
+
+  .spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid rgba(255, 255, 255, 0.1);
+    border-left-color: var(--color-primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .loading-text {
+    color: white;
+    font-size: 1.125rem;
+    text-align: center;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    margin: 0;
   }
 
   .game-frame {
@@ -144,28 +207,12 @@ const previewImage = "/images/FiddleBops.webp";
     width: 100%;
     height: 100%;
     border: none;
-    background: transparent; /* 确保iframe背景透明 */
+    background: transparent;
   }
 
   .game-frame:focus {
     outline: 3px solid var(--color-primary);
     outline-offset: -3px;
-  }
-
-  .game-instructions {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    text-align: center;
-    z-index: 1;
-    color: var(--color-text-muted);
-  }
-
-  .loading-text {
-    font-size: 1.125rem;
-    color: var(--color-text-muted);
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
   }
 
   .game-controls {
@@ -252,17 +299,16 @@ const previewImage = "/images/FiddleBops.webp";
     top: 0;
     left: 0;
     right: 0;
-    /* 高度设置为与game-wrapper相同 */
     padding-top: 56.25%;
+    padding-bottom: 2rem;
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 2;
+    z-index: 15;
     opacity: 1;
     visibility: visible;
     overflow: hidden;
     border-radius: 0.5rem 0.5rem 0 0;
-    /* 移除默认过渡效果，只在隐藏时添加 */
     transform: none;
   }
 
@@ -272,9 +318,8 @@ const previewImage = "/images/FiddleBops.webp";
     left: 0;
     width: 100%;
     height: 100%;
-    background-size: cover;
-    background-position: center;
-    filter: blur(8px);
+    object-fit: cover;
+    filter: blur(4px) brightness(1.2);
     transform: scale(1.1);
     z-index: 1;
   }
@@ -287,8 +332,8 @@ const previewImage = "/images/FiddleBops.webp";
     height: 100%;
     background: linear-gradient(
       to bottom right,
-      rgba(0, 0, 0, 0.75),
-      rgba(0, 0, 0, 0.85)
+      rgba(0, 0, 0, 0.6),
+      rgba(0, 0, 0, 0.7)
     );
     z-index: 2;
   }
@@ -300,34 +345,47 @@ const previewImage = "/images/FiddleBops.webp";
     transform: translate(-50%, -50%);
     text-align: center;
     color: white;
-    padding: 2rem;
+    padding: 3rem 2rem;
     max-width: 600px;
+    width: 100%;
     z-index: 3;
-    /* 移除默认动画，改为使用 CSS 类控制 */
     opacity: 1;
     transition: transform 0.3s ease-out;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 60%;
+  }
+
+  @media (max-width: 640px) {
+    .cover-content {
+      padding: 2rem 1rem;
+      min-height: 70%;
+    }
   }
 
   .cover-title {
     font-size: clamp(1.5rem, 4vw, 2.5rem);
     font-weight: bold;
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
     line-height: 1.2;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   }
 
   .cover-description {
     font-size: clamp(1rem, 2vw, 1.125rem);
-    margin-bottom: 2rem;
+    margin-bottom: 2.5rem;
     opacity: 0.9;
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    max-width: 80%;
   }
 
   .start-button {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    padding: 0.75rem 1.5rem;
+    padding: 1rem 2rem;
     font-size: 1.125rem;
     font-weight: 600;
     color: var(--color-primary);
@@ -336,6 +394,9 @@ const previewImage = "/images/FiddleBops.webp";
     border-radius: 9999px;
     cursor: pointer;
     transition: all 0.2s ease;
+    margin-top: auto;
+    position: relative;
+    z-index: 4;
   }
 
   .start-button:hover {
@@ -354,6 +415,56 @@ const previewImage = "/images/FiddleBops.webp";
 
   .start-button:hover .play-icon {
     transform: translateX(2px);
+  }
+
+  .error-message {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    background: rgba(0, 0, 0, 0.8);
+    padding: 2rem;
+    border-radius: 1rem;
+    color: white;
+    z-index: 20;
+  }
+
+  .error-message p {
+    margin-bottom: 1rem;
+    font-size: 1.125rem;
+  }
+
+  .error-message button {
+    padding: 0.5rem 1.5rem;
+    background: var(--color-primary);
+    border: none;
+    border-radius: 0.5rem;
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .error-message button:hover {
+    background: var(--color-primary-dark);
+  }
+
+  .game-cover[data-visible="false"] {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: all 0.3s ease-out;
+  }
+
+  .game-cover[data-visible="false"] .cover-background {
+    transform: scale(1.2);
+    transition: transform 0.5s ease-out;
+  }
+
+  .game-cover[data-visible="false"] .cover-content {
+    transform: translate(-50%, -40%);
+    opacity: 0;
+    transition: all 0.3s ease-out;
   }
 
   @media (max-width: 768px) {
@@ -415,115 +526,19 @@ const previewImage = "/images/FiddleBops.webp";
     .game-instructions-text {
       padding: 0.75rem;
     }
-  }
 
-  .game-cover[data-visible="false"] {
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-    transition: all 0.3s ease-out; /* 只在隐藏时添加过渡效果 */
-  }
+    .game-loading {
+      padding: 1.5rem;
+    }
 
-  .game-cover[data-visible="false"] .cover-background {
-    transform: scale(1.2);
-    transition: transform 0.5s ease-out;
-  }
+    .spinner {
+      width: 32px;
+      height: 32px;
+      border-width: 3px;
+    }
 
-  .game-cover[data-visible="false"] .cover-content {
-    transform: translate(-50%, -40%);
-    opacity: 0;
-    transition: all 0.3s ease-out;
+    .loading-text {
+      font-size: 1rem;
+    }
   }
 </style>
-
-<script>
-  class GameEmbedController {
-    private frame: HTMLIFrameElement;
-    private announcer: HTMLElement;
-    private loadingText: HTMLElement;
-    private gameCover: HTMLElement;
-    private startButton: HTMLButtonElement;
-
-    constructor() {
-      this.frame = document.querySelector(".game-frame") as HTMLIFrameElement;
-      this.announcer = document.querySelector("#game-announcer") as HTMLElement;
-      this.loadingText = document.querySelector(".loading-text") as HTMLElement;
-      this.gameCover = document.querySelector(".game-cover") as HTMLElement;
-      this.startButton = document.querySelector(
-        ".start-button"
-      ) as HTMLButtonElement;
-      this.init();
-    }
-
-    private init() {
-      this.setupStartButton();
-      this.setupKeyboardNavigation();
-    }
-
-    private setupStartButton() {
-      this.startButton.addEventListener("click", () => {
-        this.startGame();
-      });
-
-      this.startButton.addEventListener("keydown", (e: KeyboardEvent) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          this.startGame();
-        }
-      });
-    }
-
-    private startGame() {
-      // 显示加载提示
-      this.loadingText.style.display = "block";
-      (this.announcer as any)?.announce?.(
-        "游戏正在加载中，请稍候...",
-        "polite"
-      );
-
-      // 隐藏封面
-      this.gameCover.setAttribute("data-visible", "false");
-
-      // 设置游戏 URL
-      const gameUrl = this.frame.getAttribute("data-src");
-      if (gameUrl) {
-        this.frame.src = gameUrl;
-      }
-
-      // 监听游戏加载完成
-      this.frame.addEventListener("load", () => {
-        this.loadingText.style.display = "none";
-        (this.announcer as any)?.announce?.(
-          "游戏已加载完成，可以开始创作音乐。使用鼠标或触摸屏拖放音效图标到角色身上。",
-          "polite"
-        );
-      });
-    }
-
-    private setupKeyboardNavigation() {
-      this.frame.addEventListener("keydown", (e: KeyboardEvent) => {
-        if (e.key === "Tab") {
-          if (!e.shiftKey) {
-            const instructions = document.querySelector(
-              ".game-instructions-text"
-            );
-            if (instructions) {
-              e.preventDefault();
-              (instructions as HTMLElement).focus();
-            }
-          }
-        }
-      });
-
-      this.frame.addEventListener("focus", () => {
-        (this.announcer as any)?.announce?.(
-          "游戏区域已激活，可以使用鼠标或触摸屏进行音乐创作",
-          "polite"
-        );
-      });
-    }
-  }
-
-  // 初始化控制器
-  new GameEmbedController();
-</script>

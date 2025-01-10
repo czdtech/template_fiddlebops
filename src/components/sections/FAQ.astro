@@ -1,5 +1,4 @@
 ---
-import { siteConfig } from "@/config/site";
 import { getLangFromUrl, useTranslations } from "@/i18n/utils";
 import ScreenReader from "@/components/a11y/ScreenReader.astro";
 
@@ -16,6 +15,12 @@ const faqs = [
   { question: t("faq.q7"), answer: t("faq.a7") },
   { question: t("faq.q8"), answer: t("faq.a8") },
 ];
+
+// 定义状态消息
+const messages = {
+  expanded: "问题已展开，按 Enter 键收起",
+  collapsed: "问题已收起，按 Enter 键展开",
+} as const;
 ---
 
 <section id="faq" class="faq-section" aria-labelledby="faq-title">
@@ -32,11 +37,14 @@ const faqs = [
     >
       {
         faqs.map((faq, index) => (
-          <details class="faq-item">
+          <details class="faq-item" data-index={index}>
             <summary
+              class="faq-summary"
               role="button"
               aria-expanded="false"
               aria-controls={`faq-answer-${index}`}
+              tabindex="0"
+              id={`faq-question-${index}`}
             >
               <span class="faq-question">{faq.question}</span>
               <span class="faq-icon" aria-hidden="true" />
@@ -107,6 +115,12 @@ const faqs = [
     border-radius: 0.5rem;
     overflow: hidden;
     border: 1px solid var(--color-border);
+    transition: all 0.3s ease;
+  }
+
+  .faq-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
   }
 
   .faq-item summary {
@@ -120,6 +134,7 @@ const faqs = [
     gap: 1rem;
     outline: none;
     background: var(--color-background-light);
+    transition: all 0.3s ease;
   }
 
   .faq-item summary::-webkit-details-marker {
@@ -127,8 +142,20 @@ const faqs = [
   }
 
   .faq-item summary:focus-visible {
+    background: var(--color-background-lighter);
     outline: 2px solid var(--color-primary);
     outline-offset: 2px;
+    box-shadow: 0 0 0 4px rgba(var(--color-primary-rgb), 0.1);
+  }
+
+  .faq-item[open] {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  }
+
+  .faq-item[open] summary {
+    background: var(--color-background-lighter);
+    border-bottom: 1px solid var(--color-border);
   }
 
   .faq-question {
@@ -245,68 +272,117 @@ const faqs = [
   }
 </style>
 
-<script>
+<script define:vars={{ messages }}>
   class FAQController {
-    private items: HTMLDetailsElement[];
-
     constructor() {
       this.items = Array.from(document.querySelectorAll(".faq-item"));
+      this.announcer = document.getElementById("faq-announcer");
       this.init();
     }
 
-    private init() {
-      this.setupKeyboardNavigation();
-    }
-
-    private setupKeyboardNavigation() {
-      this.items.forEach((item, index) => {
+    init() {
+      this.items.forEach((item) => {
         const summary = item.querySelector("summary");
-        if (summary) {
-          summary.addEventListener("keydown", (e: KeyboardEvent) => {
-            switch (e.key) {
-              case "ArrowDown":
-                e.preventDefault();
-                this.focusNext(index);
-                break;
-              case "ArrowUp":
-                e.preventDefault();
-                this.focusPrevious(index);
-                break;
-              case "Home":
-                e.preventDefault();
-                this.focusFirst();
-                break;
-              case "End":
-                e.preventDefault();
-                this.focusLast();
-                break;
-            }
-          });
-        }
+        if (!summary) return;
+
+        const index = parseInt(item.dataset.index || "0", 10);
+
+        // 键盘事件处理
+        summary.addEventListener("keydown", (e) => {
+          switch (e.key) {
+            case "Enter":
+            case " ":
+              e.preventDefault();
+              this.toggleItem(item);
+              break;
+            case "ArrowDown":
+              e.preventDefault();
+              this.focusNextItem(index);
+              break;
+            case "ArrowUp":
+              e.preventDefault();
+              this.focusPreviousItem(index);
+              break;
+            case "Home":
+              e.preventDefault();
+              this.focusFirstItem();
+              break;
+            case "End":
+              e.preventDefault();
+              this.focusLastItem();
+              break;
+          }
+        });
+
+        // 点击事件处理
+        summary.addEventListener("click", (e) => {
+          e.preventDefault();
+          this.toggleItem(item);
+        });
       });
     }
 
-    private focusNext(currentIndex: number) {
-      const nextIndex =
-        currentIndex < this.items.length - 1 ? currentIndex + 1 : 0;
-      this.items[nextIndex].querySelector("summary")?.focus();
+    toggleItem(item) {
+      const isOpen = item.hasAttribute("open");
+      const summary = item.querySelector("summary");
+
+      if (summary) {
+        summary.setAttribute("aria-expanded", (!isOpen).toString());
+      }
+
+      if (!isOpen) {
+        item.setAttribute("open", "");
+        this.announce(messages.expanded);
+      } else {
+        item.removeAttribute("open");
+        this.announce(messages.collapsed);
+      }
     }
 
-    private focusPrevious(currentIndex: number) {
-      const prevIndex =
-        currentIndex > 0 ? currentIndex - 1 : this.items.length - 1;
-      this.items[prevIndex].querySelector("summary")?.focus();
+    focusNextItem(currentIndex) {
+      const nextIndex = currentIndex + 1;
+      if (nextIndex < this.items.length) {
+        const nextSummary = this.items[nextIndex].querySelector("summary");
+        if (nextSummary instanceof HTMLElement) {
+          nextSummary.focus();
+        }
+      }
     }
 
-    private focusFirst() {
-      this.items[0].querySelector("summary")?.focus();
+    focusPreviousItem(currentIndex) {
+      const prevIndex = currentIndex - 1;
+      if (prevIndex >= 0) {
+        const prevSummary = this.items[prevIndex].querySelector("summary");
+        if (prevSummary instanceof HTMLElement) {
+          prevSummary.focus();
+        }
+      }
     }
 
-    private focusLast() {
-      this.items[this.items.length - 1].querySelector("summary")?.focus();
+    focusFirstItem() {
+      const firstSummary = this.items[0]?.querySelector("summary");
+      if (firstSummary instanceof HTMLElement) {
+        firstSummary.focus();
+      }
+    }
+
+    focusLastItem() {
+      const lastSummary =
+        this.items[this.items.length - 1]?.querySelector("summary");
+      if (lastSummary instanceof HTMLElement) {
+        lastSummary.focus();
+      }
+    }
+
+    announce(message) {
+      if (this.announcer) {
+        this.announcer.textContent = message;
+      }
     }
   }
 
-  // 初始化FAQ控制器
-  new FAQController();
+  // 初始化控制器
+  document.addEventListener("DOMContentLoaded", () => {
+    new FAQController();
+  });
 </script>

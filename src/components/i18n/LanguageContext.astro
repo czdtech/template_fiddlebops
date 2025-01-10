@@ -1,0 +1,42 @@
+import type { Languages } from "@/i18n/config";
+import { getLangFromUrl, useTranslations, useTranslatedPath } from "@/i18n/utils";
+
+interface Props {
+  url: URL;
+}
+
+const { url } = Astro.props;
+const lang = getLangFromUrl(url);
+const t = useTranslations(lang);
+const translatePath = useTranslatedPath(lang);
+
+// 将语言信息添加到 HTML 元素
+Astro.response.headers.set("Content-Language", lang);
+
+// 导出上下文数据供子组件使用
+export const languageContext = {
+  lang,
+  t,
+  translatePath,
+};
+
+<slot />
+
+<script define:vars={{ lang }}>
+// 在客户端保存当前语言信息
+document.documentElement.dataset.lang = lang;
+
+// 扩展 Window 接口
+declare global {
+  interface Window {
+    CURRENT_LANG: {
+      code: Languages;
+    };
+  }
+}
+
+// 设置全局语言对象
+window.CURRENT_LANG = {
+  code: lang as Languages
+};
+</script> 

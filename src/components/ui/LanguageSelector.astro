@@ -1,0 +1,119 @@
+---
+import { languages } from "@/i18n/config";
+import {
+  getLangFromUrl,
+  useTranslations,
+  useTranslatedPath,
+} from "@/i18n/utils";
+import LanguageSelectorClient from "./LanguageSelectorClient";
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const translatePath = useTranslatedPath(lang);
+
+// 准备传递给客户端组件的数据
+const clientProps = {
+  currentLang: lang,
+  languages,
+  translations: {
+    changeLanguage: t("nav.changeLanguage"),
+    languageMenu: t("nav.languageMenu"),
+  },
+  paths: Object.keys(languages).reduce(
+    (acc, code) => ({
+      ...acc,
+      [code]: translatePath("/", code as any),
+    }),
+    {}
+  ),
+};
+---
+
+<LanguageSelectorClient {...clientProps} client:idle />
+
+<style>
+  :global(.language-selector) {
+    position: relative;
+  }
+
+  :global(.language-button) {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+    color: var(--color-text);
+    background: var(--color-background-light);
+    border: 1px solid var(--color-border);
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    outline: none;
+  }
+
+  :global(.language-button:hover),
+  :global(.language-button:focus-visible) {
+    background: var(--color-background-lighter);
+  }
+
+  :global(.language-button:focus-visible) {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+
+  :global(.arrow) {
+    transition: transform 0.2s;
+  }
+
+  :global(.language-selector[data-open="true"] .arrow) {
+    transform: rotate(180deg);
+  }
+
+  :global(.language-dropdown) {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 0.5rem;
+    padding: 0.5rem;
+    background: var(--color-background-light);
+    border: 1px solid var(--color-border);
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.2s;
+  }
+
+  :global(.language-selector[data-open="true"] .language-dropdown) {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+
+  :global(.language-link) {
+    display: block;
+    padding: 0.5rem 1rem;
+    color: var(--color-text-muted);
+    text-decoration: none;
+    white-space: nowrap;
+    transition: all 0.2s;
+    outline: none;
+  }
+
+  :global(.language-link:hover),
+  :global(.language-link:focus-visible) {
+    color: var(--color-text);
+    background: var(--color-background-lighter);
+  }
+
+  :global(.language-link:focus-visible) {
+    outline: 2px solid var(--color-primary);
+    outline-offset: -2px;
+  }
+
+  :global(.language-link.active) {
+    color: var(--color-primary);
+    background: var(--color-background-lighter);
+  }
+</style>

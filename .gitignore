@@ -21,6 +21,28 @@ pnpm-debug.log*
 # macOS-specific files
 .DS_Store
 
-# jetbrains setting folder
+# editor directories and files
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
 .idea/
-".history/" 
+.history/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# temp files
+*.log
+*.cache
+.temp
+.tmp
+
+# coverage reports
+coverage/
+
+# local certificates
+*.pem
+*.crt
+*.key 
