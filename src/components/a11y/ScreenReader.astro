@@ -3,6 +3,7 @@ interface Props {
   id?: string;
   announcePolite?: string;
   announceAssertive?: string;
+  maxHistory?: number;
   class?: string;
 }
 
@@ -10,11 +11,16 @@ const {
   id,
   announcePolite,
   announceAssertive,
+  maxHistory = 50,
   class: className = "",
 } = Astro.props;
 ---
 
-<div class:list={["screen-reader-content", className]}>
+<screen-reader-announcer
+  id={id}
+  data-max-history={maxHistory}
+  class:list={["screen-reader-content", className]}
+>
   {
     announcePolite && (
       <div
@@ -41,7 +47,186 @@ const {
       </div>
     )
   }
-</div>
+</screen-reader-announcer>
+
+<script>
+  interface AnnouncementRecord {
+    id: string;
+    message: string;
+    priority: "polite" | "assertive";
+    timestamp: number;
+    category?: string;
+    metadata?: Record<string, unknown>;
+  }
+
+  class AnnouncementHistory {
+    private records: AnnouncementRecord[] = [];
+    private maxSize: number;
+
+    constructor(maxSize = 50) {
+      this.maxSize = maxSize;
+    }
+
+    add(
+      record: Omit<AnnouncementRecord, "id" | "timestamp">
+    ): AnnouncementRecord {
+      const newRecord: AnnouncementRecord = {
+        ...record,
+        id: crypto.randomUUID(),
+        timestamp: Date.now(),
+      };
+
+      this.records.unshift(newRecord);
+
+      if (this.records.length > this.maxSize) {
+        this.records.pop();
+      }
+
+      return newRecord;
+    }
+
+    getAll(): AnnouncementRecord[] {
+      return [...this.records];
+    }
+
+    getByCategory(category: string): AnnouncementRecord[] {
+      return this.records.filter((record) => record.category === category);
+    }
+
+    getByPriority(priority: "polite" | "assertive"): AnnouncementRecord[] {
+      return this.records.filter((record) => record.priority === priority);
+    }
+
+    getByTimeRange(start: number, end: number): AnnouncementRecord[] {
+      return this.records.filter(
+        (record) => record.timestamp >= start && record.timestamp <= end
+      );
+    }
+
+    clear(): void {
+      this.records = [];
+    }
+
+    export(): string {
+      return JSON.stringify(this.records);
+    }
+
+    import(data: string): void {
+      try {
+        const parsed = JSON.parse(data);
+        if (Array.isArray(parsed)) {
+          this.records = parsed;
+        }
+      } catch (error) {
+        console.error("Failed to import announcement history:", error);
+      }
+    }
+  }
+
+  class ScreenReaderAnnouncer extends HTMLElement {
+    private politeRegion: HTMLElement | null = null;
+    private assertiveRegion: HTMLElement | null = null;
+    private history: AnnouncementHistory;
+
+    constructor() {
+      super();
+      const maxHistory = parseInt(this.dataset.maxHistory || "50", 10);
+      this.history = new AnnouncementHistory(maxHistory);
+      this.initRegions();
+    }
+
+    private initRegions() {
+      this.politeRegion = this.querySelector('[aria-live="polite"]');
+      this.assertiveRegion = this.querySelector('[aria-live="assertive"]');
+    }
+
+    public announce(
+      message: string,
+      priority: "polite" | "assertive" = "polite",
+      category?: string,
+      metadata?: Record<string, unknown>
+    ) {
+      const region =
+        priority === "polite" ? this.politeRegion : this.assertiveRegion;
+
+      if (region) {
+        // 记录公告
+        this.history.add({
+          message,
+          priority,
+          category,
+          metadata,
+        });
+
+        // 清空区域
+        region.textContent = "";
+
+        // 使用 setTimeout 确保屏幕阅读器能够识别内容变化
+        setTimeout(() => {
+          region.textContent = message;
+        }, 100);
+
+        // 触发自定义事件
+        this.dispatchEvent(
+          new CustomEvent("announcement", {
+            detail: {
+              message,
+              priority,
+              category,
+              metadata,
+            },
+          })
+        );
+      }
+    }
+
+    public clear(priority?: "polite" | "assertive") {
+      if (!priority || priority === "polite") {
+        this.politeRegion && (this.politeRegion.textContent = "");
+      }
+      if (!priority || priority === "assertive") {
+        this.assertiveRegion && (this.assertiveRegion.textContent = "");
+      }
+    }
+
+    public getHistory(): AnnouncementRecord[] {
+      return this.history.getAll();
+    }
+
+    public getHistoryByCategory(category: string): AnnouncementRecord[] {
+      return this.history.getByCategory(category);
+    }
+
+    public getHistoryByPriority(
+      priority: "polite" | "assertive"
+    ): AnnouncementRecord[] {
+      return this.history.getByPriority(priority);
+    }
+
+    public getHistoryByTimeRange(
+      start: number,
+      end: number
+    ): AnnouncementRecord[] {
+      return this.history.getByTimeRange(start, end);
+    }
+
+    public clearHistory(): void {
+      this.history.clear();
+    }
+
+    public exportHistory(): string {
+      return this.history.export();
+    }
+
+    public importHistory(data: string): void {
+      this.history.import(data);
+    }
+  }
+
+  if (!customElements.get("screen-reader-announcer")) {
+    customElements.define("screen-reader-announcer", ScreenReaderAnnouncer);
+  }
+</script>
 
 <style>
   .screen-reader-content {
@@ -68,46 +253,3 @@ const {
     border: 0;
   }
 </style>
-
-<script>
-  class ScreenReaderAnnouncer extends HTMLElement {
-    private politeRegion: HTMLElement | null = null;
-    private assertiveRegion: HTMLElement | null = null;
-
-    constructor() {
-      super();
-      this.initRegions();
-    }
-
-    private initRegions() {
-      this.politeRegion = this.querySelector('[aria-live="polite"]');
-      this.assertiveRegion = this.querySelector('[aria-live="assertive"]');
-    }
-
-    public announce(
-      message: string,
-      priority: "polite" | "assertive" = "polite"
-    ) {
-      const region =
-        priority === "polite" ? this.politeRegion : this.assertiveRegion;
-      if (region) {
-        region.textContent = "";
-        // 使用 setTimeout 确保屏幕阅读器能够识别内容变化
-        setTimeout(() => {
-          region.textContent = message;
-        }, 100);
-      }
-    }
-
-    public clear(priority?: "polite" | "assertive") {
-      if (!priority || priority === "polite") {
-        this.politeRegion && (this.politeRegion.textContent = "");
-      }
-      if (!priority || priority === "assertive") {
-        this.assertiveRegion && (this.assertiveRegion.textContent = "");
-      }
-    }
-  }
-
-  customElements.define("screen-reader-announcer", ScreenReaderAnnouncer);
-</script>

@@ -6,32 +6,49 @@ import {
   useTranslatedPath,
 } from "@/i18n/utils";
 import LanguageSelectorClient from "./LanguageSelectorClient";
+import type { Language } from "@/i18n/types";
+import ScreenReader from "@/components/a11y/ScreenReader.astro";
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
 const translatePath = useTranslatedPath(lang);
 
+// 验证语言代码
+if (!Object.keys(languages).includes(lang)) {
+  throw new Error(`Invalid language code: ${lang}`);
+}
+
 // 准备传递给客户端组件的数据
-const clientProps = {
-  currentLang: lang,
+const props = {
+  currentLang: lang as Language,
   languages,
   translations: {
     changeLanguage: t("nav.changeLanguage"),
     languageMenu: t("nav.languageMenu"),
+    currentLanguage: t("nav.currentLanguage"),
   },
-  paths: Object.keys(languages).reduce(
+  paths: Object.keys(languages).reduce<Record<Language, string>>(
     (acc, code) => ({
       ...acc,
-      [code]: translatePath("/", code as any),
+      [code as Language]: translatePath("/", code as Language),
     }),
-    {}
+    {} as Record<Language, string>
   ),
 };
 ---
 
-<LanguageSelectorClient {...clientProps} client:idle />
+<div class="language-selector-wrapper">
+  <LanguageSelectorClient {...props} />
+  <ScreenReader>
+    {t("nav.currentLanguage")}: {languages[lang as Language].name}
+  </ScreenReader>
+</div>
 
 <style>
+  .language-selector-wrapper {
+    position: relative;
+  }
+
   :global(.language-selector) {
     position: relative;
   }
@@ -39,15 +56,15 @@ const clientProps = {
   :global(.language-button) {
     display: flex;
     align-items: center;
-    gap: 0.25rem;
-    padding: 0.5rem 0.75rem;
-    font-size: 0.875rem;
+    gap: var(--spacing-1);
+    padding: var(--spacing-2) var(--spacing-3);
+    font-size: var(--font-size-sm);
     color: var(--color-text);
     background: var(--color-background-light);
     border: 1px solid var(--color-border);
-    border-radius: 0.5rem;
+    border-radius: var(--radius-md);
     cursor: pointer;
-    transition: all 0.2s;
+    transition: var(--transition-all);
     outline: none;
   }
 
@@ -62,7 +79,7 @@ const clientProps = {
   }
 
   :global(.arrow) {
-    transition: transform 0.2s;
+    transition: var(--transition-transform);
   }
 
   :global(.language-selector[data-open="true"] .arrow) {
@@ -73,16 +90,16 @@ const clientProps = {
     position: absolute;
     top: 100%;
     right: 0;
-    margin-top: 0.5rem;
-    padding: 0.5rem;
+    margin-top: var(--spacing-2);
+    padding: var(--spacing-2);
     background: var(--color-background-light);
     border: 1px solid var(--color-border);
-    border-radius: 0.5rem;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
     opacity: 0;
     visibility: hidden;
     transform: translateY(-10px);
-    transition: all 0.2s;
+    transition: var(--transition-all);
   }
 
   :global(.language-selector[data-open="true"] .language-dropdown) {
@@ -93,11 +110,11 @@ const clientProps = {
 
   :global(.language-link) {
     display: block;
-    padding: 0.5rem 1rem;
+    padding: var(--spacing-2) var(--spacing-4);
     color: var(--color-text-muted);
     text-decoration: none;
     white-space: nowrap;
-    transition: all 0.2s;
+    transition: var(--transition-all);
     outline: none;
   }
 
@@ -115,5 +132,27 @@ const clientProps = {
   :global(.language-link.active) {
     color: var(--color-primary);
     background: var(--color-background-lighter);
+  }
+
+  /* 响应式设计 */
+  @media (max-width: 768px) {
+    :global(.language-button) {
+      padding: var(--spacing-1) var(--spacing-2);
+      font-size: var(--font-size-xs);
+    }
+
+    :global(.language-dropdown) {
+      right: -1rem;
+    }
+  }
+
+  /* 减少动画 */
+  @media (prefers-reduced-motion: reduce) {
+    :global(.language-button),
+    :global(.language-link),
+    :global(.arrow),
+    :global(.language-dropdown) {
+      transition: none;
+    }
   }
 </style>

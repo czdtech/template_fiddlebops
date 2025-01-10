@@ -16,7 +16,7 @@ const {
 } = Astro.props;
 ---
 
-<div
+<live-region
   id={id}
   role={role}
   aria-live={ariaLive}
@@ -24,7 +24,155 @@ const {
   class:list={["sr-only", className]}
 >
   <slot />
-</div>
+</live-region>
+
+<script>
+  interface Message {
+    id: string;
+    text: string;
+    priority: "high" | "normal" | "low";
+    timestamp: number;
+    expiresAt?: number;
+  }
+
+  class MessageQueue {
+    private messages: Message[] = [];
+    private maxSize: number;
+    private defaultTTL: number;
+
+    constructor(maxSize = 10, defaultTTL = 5000) {
+      this.maxSize = maxSize;
+      this.defaultTTL = defaultTTL;
+    }
+
+    add(
+      text: string,
+      priority: Message["priority"] = "normal",
+      ttl?: number
+    ): Message {
+      // 清理过期消息
+      this.cleanup();
+
+      const message: Message = {
+        id: crypto.randomUUID(),
+        text,
+        priority,
+        timestamp: Date.now(),
+        expiresAt: ttl ? Date.now() + ttl : Date.now() + this.defaultTTL,
+      };
+
+      // 根据优先级插入消息
+      const insertIndex = this.messages.findIndex(
+        (m) => m.priority === "normal" && priority === "high"
+      );
+
+      if (insertIndex === -1) {
+        this.messages.push(message);
+      } else {
+        this.messages.splice(insertIndex, 0, message);
+      }
+
+      // 如果超出最大大小，移除最旧的低优先级消息
+      if (this.messages.length > this.maxSize) {
+        const removeIndex = this.messages.findIndex(
+          (m) => m.priority === "low"
+        );
+        if (removeIndex !== -1) {
+          this.messages.splice(removeIndex, 1);
+        } else {
+          this.messages.pop();
+        }
+      }
+
+      return message;
+    }
+
+    remove(id: string): void {
+      const index = this.messages.findIndex((m) => m.id === id);
+      if (index !== -1) {
+        this.messages.splice(index, 1);
+      }
+    }
+
+    cleanup(): void {
+      const now = Date.now();
+      this.messages = this.messages.filter(
+        (message) => !message.expiresAt || message.expiresAt > now
+      );
+    }
+
+    getNext(): Message | undefined {
+      this.cleanup();
+      return this.messages[0];
+    }
+
+    clear(): void {
+      this.messages = [];
+    }
+  }
+
+  class LiveRegion extends HTMLElement {
+    private queue: MessageQueue;
+    private currentMessage: Message | null = null;
+    private updateInterval: number | null = null;
+
+    constructor() {
+      super();
+      this.queue = new MessageQueue();
+      this.processQueue = this.processQueue.bind(this);
+    }
+
+    connectedCallback() {
+      this.startProcessing();
+    }
+
+    disconnectedCallback() {
+      this.stopProcessing();
+    }
+
+    private startProcessing() {
+      if (!this.updateInterval) {
+        this.updateInterval = window.setInterval(this.processQueue, 1000);
+      }
+    }
+
+    private stopProcessing() {
+      if (this.updateInterval) {
+        clearInterval(this.updateInterval);
+        this.updateInterval = null;
+      }
+    }
+
+    private processQueue() {
+      const nextMessage = this.queue.getNext();
+
+      if (nextMessage && nextMessage !== this.currentMessage) {
+        this.announce(nextMessage.text);
+        this.currentMessage = nextMessage;
+        this.queue.remove(nextMessage.id);
+      }
+    }
+
+    public announce(
+      message: string,
+      priority: Message["priority"] = "normal",
+      ttl?: number
+    ) {
+      this.queue.add(message, priority, ttl);
+      // 立即处理队列
+      this.processQueue();
+    }
+
+    public clear() {
+      this.queue.clear();
+      this.textContent = "";
+    }
+  }
+
+  if (!customElements.get("live-region")) {
+    customElements.define("live-region", LiveRegion);
+  }
+</script>
 
 <style>
   .sr-only {

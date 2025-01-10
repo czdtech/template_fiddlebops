@@ -58,6 +58,11 @@ export const en = {
   "faq.q8": "How do I get help if I encounter problems?",
   "faq.a8":
     "You can get support from the help center in the game or join our Discord community for help. Our development team and community members are happy to answer your questions.",
+  "faq.expanded": "Question expanded, press Enter to collapse",
+  "faq.collapsed": "Question collapsed, press Enter to expand",
+  "faq.navigate": "Use arrow keys to navigate between questions",
+  "faq.list": "Frequently Asked Questions List",
+  "faq.press_enter": "Press Enter to toggle answer",
   "footer.explore": "Explore the infinite possibilities",
   "footer.game": "Game",
   "footer.features": "Features",
@@ -76,7 +81,7 @@ export const en = {
     "Interactive music creation interface based on Incredibox",
   "game.controls": "Game Controls",
   "game.skipGame": "Skip Game Section",
-  "game.instructions.title": "How to Create Music",
+  "game.instructions.title": "Game Instructions",
   "game.instructions.drag": "Drag and drop sound icons onto characters",
   "game.instructions.mix":
     "Mix different sound categories: Beats, Effects, Melodies, and Voices",
@@ -95,4 +100,7 @@ export const en = {
   "orientation.rotate": "Rotate Screen",
   "orientation.continue": "Continue in Current Orientation",
   "orientation.remember": "Remember my choice",
+  "game.instructions.createTitle": "🎮 How to Create",
+  "game.instructions.soundTitle": "🎼 Sound Categories",
+  "game.instructions.controlTitle": "💫 Controls",
 } as const;

@@ -1,13 +1,28 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import type { Language } from "@/i18n/types";
+
+interface LanguageOption {
+  langCode: Language;
+  name: string;
+  locale: string;
+}
 
 interface LanguageSelectorProps {
-  currentLang: string;
-  languages: Record<string, string>;
+  currentLang: Language;
+  languages: Record<
+    Language,
+    {
+      name: string;
+      code: Language;
+      locale: string;
+    }
+  >;
   translations: {
     changeLanguage: string;
     languageMenu: string;
+    currentLanguage: string;
   };
-  paths: Record<string, string>;
+  paths: Record<Language, string>;
 }
 
 export default function LanguageSelectorClient({
@@ -19,69 +34,161 @@ export default function LanguageSelectorClient({
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const [activeIndex, setActiveIndex] = useState(-1);
 
+  // 缓存语言选项列表
+  const languageOptions = useMemo<LanguageOption[]>(() => {
+    return Object.entries(languages).map(([langCode, langInfo]) => ({
+      langCode: langCode as Language,
+      name: langInfo.name,
+      locale: langInfo.locale,
+    }));
+  }, [languages]);
+
+  // 处理点击外部关闭
+  const handleClickOutside = useCallback((event: MouseEvent) => {
+    if (
+      containerRef.current &&
+      !containerRef.current.contains(event.target as Node)
+    ) {
+      setIsOpen(false);
+      setActiveIndex(-1);
+    }
+  }, []);
+
+  // 处理 ESC 键关闭
+  const handleEscKey = useCallback((event: KeyboardEvent) => {
+    if (event.key === "Escape") {
+      setIsOpen(false);
+      setActiveIndex(-1);
+      buttonRef.current?.focus();
+    }
+  }, []);
+
+  // 处理键盘导航
+  const handleKeyDown = useCallback(
+    (event: React.KeyboardEvent) => {
+      if (!isOpen && (event.key === "Enter" || event.key === " ")) {
+        event.preventDefault();
+        setIsOpen(true);
+        setActiveIndex(0);
+        return;
+      }
+
+      if (!isOpen) return;
+
+      switch (event.key) {
+        case "ArrowDown":
+          event.preventDefault();
+          setActiveIndex((prev) =>
+            prev < languageOptions.length - 1 ? prev + 1 : 0
+          );
+          break;
+        case "ArrowUp":
+          event.preventDefault();
+          setActiveIndex((prev) =>
+            prev > 0 ? prev - 1 : languageOptions.length - 1
+          );
+          break;
+        case "Home":
+          event.preventDefault();
+          setActiveIndex(0);
+          break;
+        case "End":
+          event.preventDefault();
+          setActiveIndex(languageOptions.length - 1);
+          break;
+        case "Enter":
+        case " ":
+          event.preventDefault();
+          if (activeIndex >= 0 && activeIndex < languageOptions.length) {
+            const option = languageOptions[activeIndex];
+            if (option && option.langCode) {
+              window.location.href = paths[option.langCode];
+            }
+          }
+          break;
+      }
+    },
+    [isOpen, languageOptions, paths]
+  );
+
+  // 设置事件监听
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        containerRef.current &&
-        !containerRef.current.contains(event.target as Node)
-      ) {
-        setIsOpen(false);
+    if (isOpen) {
+      document.addEventListener("click", handleClickOutside);
+      document.addEventListener("keydown", handleEscKey);
+      return () => {
+        document.removeEventListener("click", handleClickOutside);
+        document.removeEventListener("keydown", handleEscKey);
+      };
+    }
+  }, [isOpen, handleClickOutside, handleEscKey]);
+
+  // 焦点管理
+  useEffect(() => {
+    if (isOpen && activeIndex >= 0) {
+      const menuItems = menuRef.current?.querySelectorAll('[role="menuitem"]');
+      if (menuItems && menuItems[activeIndex]) {
+        (menuItems[activeIndex] as HTMLElement).focus();
       }
-    };
+    }
+  }, [isOpen, activeIndex]);
 
-    const handleEscKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        setIsOpen(false);
-      }
-    };
-
-    document.addEventListener("click", handleClickOutside);
-    document.addEventListener("keydown", handleEscKey);
-
-    return () => {
-      document.removeEventListener("click", handleClickOutside);
-      document.removeEventListener("keydown", handleEscKey);
-    };
+  const toggleMenu = useCallback(() => {
+    setIsOpen((prev) => !prev);
+    setActiveIndex(-1);
   }, []);
 
   return (
-    <div ref={containerRef} className="language-selector" data-open={isOpen}>
+    <div
+      ref={containerRef}
+      className="language-selector"
+      data-open={isOpen}
+      role="navigation"
+      aria-label={translations.languageMenu}
+    >
       <button
         ref={buttonRef}
         className="language-button"
+        onClick={toggleMenu}
+        onKeyDown={handleKeyDown}
         aria-expanded={isOpen}
-        aria-haspopup="true"
-        aria-controls="language-dropdown"
+        aria-haspopup="menu"
+        aria-controls="language-menu"
         aria-label={translations.changeLanguage}
-        onClick={() => setIsOpen(!isOpen)}
       >
-        <span>{languages[currentLang]}</span>
-        <svg
-          className="arrow"
-          viewBox="0 0 24 24"
-          width="16"
-          height="16"
-          aria-hidden="true"
-        >
-          <path fill="currentColor" d="M7 10l5 5 5-5z" />
-        </svg>
+        <span>{languages[currentLang].name}</span>
+        <span className="arrow" aria-hidden="true">
+          ▼
+        </span>
       </button>
+
       <div
-        id="language-dropdown"
+        id="language-menu"
+        ref={menuRef}
         className="language-dropdown"
         role="menu"
         aria-label={translations.languageMenu}
+        onKeyDown={handleKeyDown}
       >
-        {Object.entries(languages).map(([code, label]) => (
+        {languageOptions.map((lang, index) => (
           <a
-            key={code}
-            href={paths[code]}
-            className={`language-link ${code === currentLang ? "active" : ""}`}
+            key={lang.langCode}
+            href={paths[lang.langCode]}
+            className={`language-link ${
+              lang.langCode === currentLang ? "active" : ""
+            }`}
             role="menuitem"
-            aria-current={code === currentLang ? "true" : undefined}
+            tabIndex={isOpen ? 0 : -1}
+            aria-current={lang.langCode === currentLang ? "page" : undefined}
+            aria-selected={index === activeIndex}
           >
-            {label}
+            {lang.name}
+            {lang.langCode === currentLang && (
+              <span className="sr-only">({translations.currentLanguage})</span>
+            )}
           </a>
         ))}
       </div>

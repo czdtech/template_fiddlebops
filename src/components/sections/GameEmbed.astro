@@ -2,12 +2,10 @@
 import { getLangFromUrl, useTranslations } from "@/i18n/utils";
 import ScreenReader from "@/components/a11y/ScreenReader.astro";
 import { Image } from "astro:assets";
+import { defaultGameConfig } from "@/config/game";
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
-
-const previewImage = "/images/FiddleBops.webp";
-const gameUrl = "https://silkycell.github.io/FiddleBops/";
 ---
 
 <!-- DNS 预解析 -->
@@ -23,7 +21,7 @@ const gameUrl = "https://silkycell.github.io/FiddleBops/";
     <div class="game-container">
       <div class="game-cover" data-visible="true">
         <Image
-          src={previewImage}
+          src={defaultGameConfig.previewImage}
           alt=""
           width={1200}
           height={675}
@@ -69,7 +67,7 @@ const gameUrl = "https://silkycell.github.io/FiddleBops/";
         </div>
 
         <iframe
-          data-src={gameUrl}
+          data-src={defaultGameConfig.url}
           title={t("game.frameTitle")}
           class="game-frame"
           tabindex="0"
@@ -91,15 +89,17 @@ const gameUrl = "https://silkycell.github.io/FiddleBops/";
           <h3>{t("game.instructions.title")}</h3>
           <div class="instructions-grid">
             <div class="instruction-block">
-              <h4>🎮 {lang === "zh" ? "创作方式" : "How to Create"}</h4>
+              <h4>{t("game.instructions.createTitle")}</h4>
               <ul>
-                <li>{t("game.instructions.drag")}</li>
-                <li>{t("game.instructions.mix")}</li>
-                <li>{t("game.instructions.create")}</li>
+                {
+                  defaultGameConfig.controls.desktop.map((control) => (
+                    <li>{control}</li>
+                  ))
+                }
               </ul>
             </div>
             <div class="instruction-block">
-              <h4>🎼 {lang === "zh" ? "音效类别" : "Sound Categories"}</h4>
+              <h4>{t("game.instructions.soundTitle")}</h4>
               <ul>
                 <li>{t("game.category.beats")}</li>
                 <li>{t("game.category.effects")}</li>
@@ -108,7 +108,7 @@ const gameUrl = "https://silkycell.github.io/FiddleBops/";
               </ul>
             </div>
             <div class="instruction-block">
-              <h4>💫 {lang === "zh" ? "操作方式" : "Controls"}</h4>
+              <h4>{t("game.instructions.controlTitle")}</h4>
               <ul>
                 <li>{t("game.instructions.desktop")}</li>
                 <li>{t("game.instructions.mobile")}</li>

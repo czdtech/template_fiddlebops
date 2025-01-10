@@ -1,35 +1,152 @@
 ---
+export const ButtonVariant = {
+  PRIMARY: "primary",
+  SECONDARY: "secondary",
+  OUTLINE: "outline",
+  GHOST: "ghost",
+} as const;
+
+export type ButtonVariant = (typeof ButtonVariant)[keyof typeof ButtonVariant];
+
 interface Props {
   href?: string;
-  variant?: 'primary' | 'secondary';
+  variant?: ButtonVariant;
   class?: string;
   id?: string;
+  disabled?: boolean;
+  loading?: boolean;
+  type?: "button" | "submit" | "reset";
+  ariaLabel?: string;
+  ariaDescribedBy?: string;
+  ariaExpanded?: boolean;
+  ariaControls?: string;
+  onClick?: () => void;
 }
 
-const { 
-  href, 
-  variant = 'primary',
-  class: className = '',
-  id
+const {
+  href,
+  variant = ButtonVariant.PRIMARY,
+  class: className = "",
+  id,
+  disabled = false,
+  loading = false,
+  type = "button",
+  ariaLabel,
+  ariaDescribedBy,
+  ariaExpanded,
+  ariaControls,
 } = Astro.props;
 
-const baseStyles = "px-8 py-4 rounded-lg transform hover:scale-105 transition-standard text-text";
+const baseStyles = [
+  "inline-flex",
+  "items-center",
+  "justify-center",
+  "gap-2",
+  "px-6",
+  "py-3",
+  "rounded-lg",
+  "font-medium",
+  "transition-all",
+  "focus:outline-none",
+  "focus-visible:ring-2",
+  "focus-visible:ring-offset-2",
+  "focus-visible:ring-primary",
+  "disabled:opacity-50",
+  "disabled:cursor-not-allowed",
+];
+
 const variantStyles = {
-  primary: "bg-accent hover:bg-accent-dark",
-  secondary: "bg-secondary hover:bg-secondary-dark"
+  [ButtonVariant.PRIMARY]: [
+    "bg-primary",
+    "text-white",
+    "hover:bg-primary-dark",
+    "active:bg-primary-dark",
+  ],
+  [ButtonVariant.SECONDARY]: [
+    "bg-accent",
+    "text-white",
+    "hover:bg-accent-dark",
+    "active:bg-accent-dark",
+  ],
+  [ButtonVariant.OUTLINE]: [
+    "border",
+    "border-primary",
+    "text-primary",
+    "hover:bg-primary",
+    "hover:text-white",
+    "active:bg-primary-dark",
+  ],
+  [ButtonVariant.GHOST]: [
+    "text-primary",
+    "hover:bg-primary/10",
+    "active:bg-primary/20",
+  ],
 };
 
-const Tag = href ? 'a' : 'button';
+const Tag = href ? "a" : "button";
 ---
 
 <Tag
   href={href}
   id={id}
+  type={!href ? type : undefined}
+  disabled={disabled || loading}
+  aria-label={ariaLabel}
+  aria-describedby={ariaDescribedBy}
+  aria-expanded={ariaExpanded}
+  aria-controls={ariaControls}
   class:list={[
     baseStyles,
     variantStyles[variant],
-    className
+    loading && "cursor-wait",
+    className,
   ]}
 >
+  {
+    loading && (
+      <span class="loading-spinner" aria-hidden="true">
+        <span class="sr-only">加载中...</span>
+      </span>
+    )
+  }
   <slot />
-</Tag> 
+</Tag>
+
+<style>
+  .loading-spinner {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    border: 2px solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    animation: spin 0.75s linear infinite;
+  }
+
+  @keyframes spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .loading-spinner {
+      animation: none;
+    }
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+</style>

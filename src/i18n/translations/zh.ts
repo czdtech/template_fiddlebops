@@ -57,6 +57,11 @@ export const zh = {
   "faq.q8": "遇到问题如何获取帮助？",
   "faq.a8":
     "您可以通过游戏内的帮助中心获取支持，或者加入我们的 Discord 社区寻求帮助。我们的开发团队和社区成员都很乐意为您解答问题。",
+  "faq.expanded": "问题已展开，按 Enter 键收起",
+  "faq.collapsed": "问题已收起，按 Enter 键展开",
+  "faq.navigate": "使用方向键在问题之间导航",
+  "faq.list": "常见问题列表",
+  "faq.press_enter": "按 Enter 键切换答案",
   "footer.explore": "探索音乐的无限可能",
   "footer.game": "游戏",
   "footer.features": "特色",
@@ -74,7 +79,7 @@ export const zh = {
   "game.frameDescription": "基于 Incredibox 的互动音乐创作界面",
   "game.controls": "游戏控制",
   "game.skipGame": "跳过游戏区域",
-  "game.instructions.title": "音乐创作指南",
+  "game.instructions.title": "游戏说明",
   "game.instructions.drag": "将音效图标拖放到角色身上",
   "game.instructions.mix": "混合不同的音效类别：节拍、效果、旋律和人声",
   "game.instructions.create": "创作属于你的独特音乐作品",
@@ -91,4 +96,7 @@ export const zh = {
   "orientation.rotate": "旋转屏幕",
   "orientation.continue": "继续当前方向",
   "orientation.remember": "记住我的选择",
+  "game.instructions.createTitle": "🎮 创作方式",
+  "game.instructions.soundTitle": "🎼 音效类别",
+  "game.instructions.controlTitle": "💫 操作方式",
 } as const;

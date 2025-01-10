@@ -1,36 +1,120 @@
 ---
-import { Image } from 'astro:assets';
-import type { ImageMetadata } from 'astro';
+import { Image } from "astro:assets";
+import type { ImageMetadata } from "astro";
+import ScreenReader from "@/components/a11y/ScreenReader.astro";
+
+export const LoadingStrategy = {
+  EAGER: "eager",
+  LAZY: "lazy",
+} as const;
+
+export type LoadingStrategy =
+  (typeof LoadingStrategy)[keyof typeof LoadingStrategy];
+
+export const ImageSizes = {
+  SMALL: 300,
+  MEDIUM: 600,
+  LARGE: 900,
+  FULL: 1200,
+} as const;
+
+type AriaRole = "img" | "button" | "link" | "presentation" | "none";
 
 interface Props {
   src: ImageMetadata;
   alt: string;
-  loading?: 'eager' | 'lazy';
+  loading?: LoadingStrategy;
   className?: string;
+  width?: number;
+  height?: number;
+  quality?: number;
+  ariaLabel?: string;
+  role?: AriaRole;
+  focusable?: boolean;
 }
 
-const { 
-  src, 
-  alt, 
-  loading = 'lazy',
-  className = 'border-accent'
-} = Astro.props;
-
-const imageProps: Parameters<typeof Image>[0] = {
+const {
   src,
   alt,
-  width: 1200,
-  height: 800,
-  quality: 80,
-  widths: [300, 600, 900],
-  sizes: "(max-width: 768px) 100vw, 50vw",
+  loading = LoadingStrategy.LAZY,
+  className = "",
+  width = ImageSizes.FULL,
+  height = Math.round(width * (2 / 3)), // 保持 3:2 的宽高比
+  quality = 80,
+  ariaLabel,
+  role = "img",
+  focusable = true,
+} = Astro.props;
+
+// 计算响应式尺寸
+const sizes = [ImageSizes.SMALL, ImageSizes.MEDIUM, ImageSizes.LARGE].filter(
+  (size) => size <= width
+);
+
+const imageProps = {
+  src,
+  alt,
+  width,
+  height,
+  quality,
+  widths: sizes,
+  sizes: `(max-width: 768px) 100vw, ${Math.min(width, 800)}px`,
   format: "webp",
   loading,
-  decoding: "async"
-};
+  decoding: "async",
+} as const;
 ---
 
-<Image
-  {...imageProps}
-  class={`rounded-xl shadow-lg border-2 sm:border-4 ${className} transform hover:scale-[1.02] transition-standard`}
-/> 
+<div
+  class:list={["game-preview", "relative", className]}
+  role={role}
+  aria-label={ariaLabel || alt}
+  tabindex={focusable ? 0 : undefined}
+>
+  <Image
+    {...imageProps}
+    class:list={[
+      "rounded-xl",
+      "shadow-lg",
+      "border-2",
+      "sm:border-4",
+      "border-accent",
+      "transform",
+      "hover:scale-[1.02]",
+      "transition-all",
+      "focus:outline-none",
+      "focus-visible:ring-2",
+      "focus-visible:ring-primary",
+      "focus-visible:ring-offset-2",
+    ]}
+  />
+  <ScreenReader>
+    {alt}
+  </ScreenReader>
+</div>
+
+<style>
+  .game-preview {
+    position: relative;
+    width: 100%;
+    height: auto;
+    transition: var(--transition-all);
+  }
+
+  /* 响应式设计 */
+  @media (max-width: 768px) {
+    .game-preview :global(img) {
+      border-width: 2px;
+    }
+  }
+
+  /* 减少动画 */
+  @media (prefers-reduced-motion: reduce) {
+    .game-preview {
+      transition: none;
+    }
+    .game-preview :global(img) {
+      transform: none !important;
+    }
+  }
+</style>

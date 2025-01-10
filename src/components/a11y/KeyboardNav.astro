@@ -1,6 +1,4 @@
 ---
-import { KeyCode } from "@/utils/a11y";
-
 interface Props {
   id?: string;
   role?: "navigation" | "menu" | "tablist";
@@ -27,72 +25,160 @@ const {
 
 <script>
   import { KeyCode } from "@/utils/a11y";
+  import { debounce } from "@/utils/performance";
+
+  interface NavigationChangeDetail {
+    currentIndex: number;
+    item: HTMLElement;
+  }
 
   class KeyboardNav extends HTMLElement {
-    items: HTMLElement[];
+    private items: HTMLElement[] = [];
+    private observer: MutationObserver | null = null;
+    private orientation: "horizontal" | "vertical" = "horizontal";
+    private debouncedUpdateItems: () => void;
 
     constructor() {
       super();
       this.handleKeyDown = this.handleKeyDown.bind(this);
+      this.updateItems = this.updateItems.bind(this);
+      this.debouncedUpdateItems = debounce(this.updateItems, 100);
+    }
+
+    private updateItems(): void {
       this.items = Array.from(
         this.querySelectorAll('[role="menuitem"], [role="tab"]')
       ) as HTMLElement[];
     }
 
-    connectedCallback() {
+    private initMutationObserver(): void {
+      this.observer = new MutationObserver((mutations) => {
+        const shouldUpdate = mutations.some(
+          (mutation) =>
+            mutation.type === "childList" ||
+            (mutation.type === "attributes" &&
+              mutation.attributeName === "role")
+        );
+        if (shouldUpdate) {
+          this.debouncedUpdateItems();
+        }
+      });
+
+      this.observer.observe(this, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ["role"],
+      });
+    }
+
+    connectedCallback(): void {
+      this.orientation =
+        (this.getAttribute("aria-orientation") as "horizontal" | "vertical") ||
+        "horizontal";
+      this.updateItems();
+      this.initMutationObserver();
       this.addEventListener("keydown", this.handleKeyDown);
     }
 
-    disconnectedCallback() {
+    disconnectedCallback(): void {
       this.removeEventListener("keydown", this.handleKeyDown);
+      if (this.observer) {
+        this.observer.disconnect();
+        this.observer = null;
+      }
     }
 
-    handleKeyDown(event: KeyboardEvent) {
+    private getNextIndex(
+      currentIndex: number,
+      direction: "next" | "prev"
+    ): number {
+      const lastIndex = this.items.length - 1;
+      if (direction === "next") {
+        return currentIndex < lastIndex ? currentIndex + 1 : 0;
+      }
+      return currentIndex > 0 ? currentIndex - 1 : lastIndex;
+    }
+
+    private handleKeyDown(event: KeyboardEvent): void {
       const target = event.target as HTMLElement;
       const isMenuItem = target.matches('[role="menuitem"], [role="tab"]');
       if (!isMenuItem) return;
 
       const currentIndex = this.items.indexOf(target);
-      let nextIndex: number;
+      let targetIndex: number | undefined;
 
       switch (event.key) {
         case KeyCode.LEFT:
+          if (this.orientation === "horizontal") {
+            event.preventDefault();
+            targetIndex = this.getNextIndex(currentIndex, "prev");
+          }
+          break;
+
         case KeyCode.UP:
-          event.preventDefault();
-          nextIndex =
-            currentIndex > 0 ? currentIndex - 1 : this.items.length - 1;
+          if (this.orientation === "vertical") {
+            event.preventDefault();
+            targetIndex = this.getNextIndex(currentIndex, "prev");
+          }
           break;
 
         case KeyCode.RIGHT:
+          if (this.orientation === "horizontal") {
+            event.preventDefault();
+            targetIndex = this.getNextIndex(currentIndex, "next");
+          }
+          break;
+
         case KeyCode.DOWN:
-          event.preventDefault();
-          nextIndex =
-            currentIndex < this.items.length - 1 ? currentIndex + 1 : 0;
+          if (this.orientation === "vertical") {
+            event.preventDefault();
+            targetIndex = this.getNextIndex(currentIndex, "next");
+          }
           break;
 
         case KeyCode.HOME:
           event.preventDefault();
-          nextIndex = 0;
+          targetIndex = 0;
           break;
 
         case KeyCode.END:
           event.preventDefault();
-          nextIndex = this.items.length - 1;
+          targetIndex = this.items.length - 1;
           break;
 
         default:
           return;
       }
 
-      const nextItem = this.items[nextIndex];
-      nextItem.focus();
+      if (typeof targetIndex !== "undefined") {
+        const nextItem = this.items[targetIndex];
+        if (nextItem) {
+          nextItem.focus();
+          // 触发自定义事件
+          this.dispatchEvent(
+            new CustomEvent<NavigationChangeDetail>("navigationchange", {
+              detail: {
+                currentIndex: targetIndex,
+                item: nextItem,
+              },
+            })
+          );
+        }
+      }
     }
   }
 
-  customElements.define("keyboard-nav", KeyboardNav);
+  if (!customElements.get("keyboard-nav")) {
+    customElements.define("keyboard-nav", KeyboardNav);
+  }
 </script>
 
 <style>
+  keyboard-nav {
+    display: contents;
+  }
+
   keyboard-nav:focus {
     outline: none;
   }
@@ -107,5 +193,13 @@ const {
   keyboard-nav :global([role="tab"]:focus) {
     outline: 2px solid var(--color-primary);
     outline-offset: 2px;
+  }
+
+  /* 减少动画 */
+  @media (prefers-reduced-motion: reduce) {
+    keyboard-nav :global([role="menuitem"]:focus),
+    keyboard-nav :global([role="tab"]:focus) {
+      transition: none;
+    }
   }
 </style>

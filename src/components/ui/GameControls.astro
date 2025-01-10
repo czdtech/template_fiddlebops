@@ -1,26 +1,55 @@
 ---
 import { getDeviceType } from "@/utils/mobile";
 import type { GameConfig } from "@/config/types";
+import { getLangFromUrl, useTranslations } from "@/i18n/utils";
 import OrientationNotice from "./orientation/OrientationNotice.astro";
 import ControlsGuide from "./controls/ControlsGuide.astro";
+import ScreenReader from "@/components/a11y/ScreenReader.astro";
+
+export const DeviceType = {
+  DESKTOP: "desktop",
+  TABLET: "tablet",
+  MOBILE: "mobile",
+} as const;
+
+export type DeviceType = (typeof DeviceType)[keyof typeof DeviceType];
 
 interface Props {
   config: GameConfig;
   className?: string;
+  ariaLabel?: string;
+  ariaDescribedBy?: string;
 }
 
-const { config, className = "" } = Astro.props;
+const { config, className = "", ariaLabel, ariaDescribedBy } = Astro.props;
+
 const deviceType = getDeviceType();
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+// 验证配置
+if (!config.controls || !Array.isArray(config.controls)) {
+  throw new Error("Game controls configuration is invalid");
+}
 ---
 
-<div class={`game-controls ${className}`}>
+<div
+  class:list={["game-controls", className]}
+  role="region"
+  aria-label={ariaLabel || t("game.controls")}
+  aria-describedby={ariaDescribedBy}
+>
   {
-    config.orientation === "landscape" && deviceType !== "desktop" && (
+    config.orientation === "landscape" && deviceType !== DeviceType.DESKTOP && (
       <OrientationNotice />
     )
   }
 
   <ControlsGuide deviceType={deviceType} controls={config.controls} />
+
+  <ScreenReader>
+    {t("game.controls")}
+  </ScreenReader>
 </div>
 
 <style>
@@ -28,7 +57,28 @@ const deviceType = getDeviceType();
     position: relative;
     width: 100%;
     background: var(--color-background-lighter);
-    border-radius: 0 0 1rem 1rem;
+    border-radius: 0 0 var(--radius-lg) var(--radius-lg);
     overflow: hidden;
+    transition: var(--transition-all);
+  }
+
+  /* 响应式设计 */
+  @media (max-width: 768px) {
+    .game-controls {
+      border-radius: 0 0 var(--radius-md) var(--radius-md);
+    }
+  }
+
+  @media (max-width: 480px) {
+    .game-controls {
+      border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+    }
+  }
+
+  /* 减少动画 */
+  @media (prefers-reduced-motion: reduce) {
+    .game-controls {
+      transition: none;
+    }
   }
 </style>

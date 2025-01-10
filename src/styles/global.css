@@ -74,6 +74,47 @@
     stroke 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 
   --color-primary-rgb: 99, 102, 241; /* 对应 --color-primary 的 RGB 值 */
+
+  /* 卡片样式变量 */
+  --card-padding-desktop: 2rem;
+  --card-padding-tablet: 1.5rem;
+  --card-padding-mobile: 1.25rem;
+  --card-border-radius: 1rem;
+  --card-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  --card-hover-transform: translateY(-5px);
+
+  /* 文本渐变 */
+  --text-gradient: linear-gradient(
+    135deg,
+    var(--color-primary) 0%,
+    var(--color-accent) 100%
+  );
+
+  /* 布局变量 */
+  --container-max-width: 1200px;
+  --container-padding: 1rem;
+  --section-padding-y: 4rem;
+  --section-padding-y-tablet: 3rem;
+  --section-padding-y-mobile: 2rem;
+
+  /* Hero 组件变量 */
+  --hero-min-height: 20vh;
+  --hero-min-height-tablet: 18vh;
+  --hero-min-height-mobile: 15vh;
+  --hero-content-max-width: 800px;
+  --hero-description-max-width: 540px;
+  --hero-gradient: radial-gradient(
+      circle at 20% 30%,
+      var(--color-primary) 0%,
+      transparent 70%
+    ),
+    radial-gradient(circle at 80% 70%, var(--color-accent) 0%, transparent 70%);
+
+  /* 字体大小 */
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
 }
 
 /* 基础样式 */

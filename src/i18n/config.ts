@@ -1,13 +1,21 @@
+import type { LanguageConfig } from "./types";
 import { en } from "./translations/en";
 import { zh } from "./translations/zh";
-import { checkTranslationCompleteness } from "./dev-utils";
 
-export const languages = {
-  en: "English",
-  zh: "中文",
+export const languages: LanguageConfig = {
+  en: {
+    name: "English",
+    code: "en",
+    locale: "en-US",
+  },
+  zh: {
+    name: "中文",
+    code: "zh",
+    locale: "zh-CN",
+  },
 } as const;
 
-export const defaultLang = "en";
+export const defaultLang = "en" as const;
 
 export const ui = {
   en,
@@ -16,8 +24,3 @@ export const ui = {
 
 export type Languages = keyof typeof languages;
 export type UiKeys = keyof typeof en;
-
-// 在开发环境中检查翻译完整性
-if (import.meta.env.DEV) {
-  checkTranslationCompleteness(en, zh);
-}

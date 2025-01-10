@@ -1,43 +1,34 @@
 ---
 import { getLangFromUrl, useTranslations } from "@/i18n/utils";
 import ScreenReader from "@/components/a11y/ScreenReader.astro";
+import { faqs } from "@/data/faqs";
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
 
-const faqs = [
-  { question: t("faq.q1"), answer: t("faq.a1") },
-  { question: t("faq.q2"), answer: t("faq.a2") },
-  { question: t("faq.q3"), answer: t("faq.a3") },
-  { question: t("faq.q4"), answer: t("faq.a4") },
-  { question: t("faq.q5"), answer: t("faq.a5") },
-  { question: t("faq.q6"), answer: t("faq.a6") },
-  { question: t("faq.q7"), answer: t("faq.a7") },
-  { question: t("faq.q8"), answer: t("faq.a8") },
-];
-
 // 定义状态消息
 const messages = {
-  expanded: "问题已展开，按 Enter 键收起",
-  collapsed: "问题已收起，按 Enter 键展开",
+  expanded: t("faq.expanded"),
+  collapsed: t("faq.collapsed"),
+  navigate: t("faq.navigate"),
 } as const;
 ---
 
-<section id="faq" class="faq-section" aria-labelledby="faq-title">
+<section
+  id="faq"
+  class="faq-section"
+  aria-labelledby="faq-title"
+  aria-describedby="faq-description"
+>
   <div class="container">
     <div class="faq-header">
-      <h2 id="faq-title">{t("faq.title")}</h2>
+      <h2 id="faq-title" class="gradient-text">{t("faq.title")}</h2>
       <p id="faq-description">{t("faq.subtitle")}</p>
     </div>
-    <div
-      class="faq-grid"
-      role="region"
-      aria-labelledby="faq-title"
-      aria-describedby="faq-description"
-    >
+    <div class="faq-grid" role="list" aria-label={t("faq.list")}>
       {
         faqs.map((faq, index) => (
-          <details class="faq-item" data-index={index}>
+          <details class="faq-item" data-index={index} role="listitem">
             <summary
               class="faq-summary"
               role="button"
@@ -45,8 +36,9 @@ const messages = {
               aria-controls={`faq-answer-${index}`}
               tabindex="0"
               id={`faq-question-${index}`}
+              aria-label={`${t(faq.question)}. ${t("faq.press_enter")}`}
             >
-              <span class="faq-question">{faq.question}</span>
+              <span class="faq-question">{t(faq.question)}</span>
               <span class="faq-icon" aria-hidden="true" />
             </summary>
             <div
@@ -55,45 +47,41 @@ const messages = {
               role="region"
               aria-labelledby={`faq-question-${index}`}
             >
-              <p>{faq.answer}</p>
+              <p>{t(faq.answer)}</p>
             </div>
           </details>
         ))
       }
     </div>
   </div>
-  <ScreenReader id="faq-announcer" />
+  <ScreenReader id="faq-announcer" aria-live="polite" />
 </section>
 
 <style>
   .faq-section {
-    padding: 4rem 0 6rem;
+    padding: var(--section-padding-y) 0;
     background: var(--color-background);
-    margin-bottom: 0;
   }
 
   .container {
     width: 100%;
-    max-width: 1200px;
+    max-width: var(--container-max-width);
     margin: 0 auto;
-    padding: 0 1rem;
+    padding: 0 var(--container-padding);
   }
 
   .faq-header {
     text-align: center;
-    margin-bottom: 3rem;
+    margin-bottom: var(--spacing-12);
   }
 
-  .faq-header h2 {
+  .gradient-text {
     font-size: clamp(2rem, 4vw, 3rem);
-    margin-bottom: 1rem;
-    background: linear-gradient(
-      to right,
-      var(--color-primary),
-      var(--color-accent)
-    );
+    margin-bottom: var(--spacing-4);
+    background: var(--text-gradient);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
 
   .faq-header p {
@@ -102,58 +90,56 @@ const messages = {
   }
 
   .faq-grid {
-    max-width: 800px;
-    margin: 0 auto;
     display: grid;
-    grid-template-columns: 1fr;
-    gap: 1rem;
-    padding: 0 1rem;
+    grid-template-columns: minmax(0, 800px);
+    gap: var(--spacing-4);
+    justify-content: center;
+    padding: 0 var(--container-padding);
   }
 
   .faq-item {
     background: var(--color-background-light);
-    border-radius: 0.5rem;
+    border-radius: var(--radius-lg);
     overflow: hidden;
     border: 1px solid var(--color-border);
-    transition: all 0.3s ease;
+    transition: var(--transition-all);
   }
 
   .faq-item:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    transform: var(--card-hover-transform);
+    box-shadow: var(--card-shadow);
   }
 
-  .faq-item summary {
-    padding: 1.5rem;
+  .faq-summary {
+    padding: var(--card-padding-desktop);
     cursor: pointer;
     position: relative;
     list-style: none;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 1rem;
+    gap: var(--spacing-4);
     outline: none;
     background: var(--color-background-light);
-    transition: all 0.3s ease;
+    transition: var(--transition-all);
   }
 
-  .faq-item summary::-webkit-details-marker {
+  .faq-summary::-webkit-details-marker {
     display: none;
   }
 
-  .faq-item summary:focus-visible {
+  .faq-summary:focus-visible {
     background: var(--color-background-lighter);
     outline: 2px solid var(--color-primary);
     outline-offset: 2px;
-    box-shadow: 0 0 0 4px rgba(var(--color-primary-rgb), 0.1);
   }
 
   .faq-item[open] {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    transform: var(--card-hover-transform);
+    box-shadow: var(--card-shadow);
   }
 
-  .faq-item[open] summary {
+  .faq-item[open] .faq-summary {
     background: var(--color-background-lighter);
     border-bottom: 1px solid var(--color-border);
   }
@@ -177,6 +163,7 @@ const messages = {
     position: absolute;
     background: var(--color-primary);
     border-radius: 2px;
+    transition: var(--transition-transform);
   }
 
   .faq-icon::before {
@@ -194,11 +181,12 @@ const messages = {
   }
 
   .faq-item[open] .faq-icon::before {
-    display: none;
+    transform: rotate(90deg);
+    opacity: 0;
   }
 
   .faq-answer {
-    padding: 0 1.5rem 1.5rem;
+    padding: 0 var(--card-padding-desktop) var(--card-padding-desktop);
     color: var(--color-text-muted);
     line-height: 1.6;
     background: var(--color-background-light);
@@ -206,67 +194,30 @@ const messages = {
 
   @media (max-width: 768px) {
     .faq-section {
-      padding: 3rem 0 4rem;
+      padding: var(--section-padding-y-tablet) 0;
     }
 
-    .faq-header {
-      margin-bottom: 2rem;
-    }
-
-    .faq-header h2 {
-      font-size: clamp(1.5rem, 5vw, 2rem);
-    }
-
-    .faq-header p {
-      font-size: clamp(0.875rem, 2vw, 1rem);
-      padding: 0 1rem;
-    }
-
-    .faq-grid {
-      padding: 0 0.75rem;
-    }
-
-    .faq-item summary {
-      padding: 1.25rem;
-    }
-
-    .faq-question {
-      font-size: 0.9375rem;
+    .faq-summary {
+      padding: var(--card-padding-tablet);
     }
 
     .faq-answer {
-      padding: 0 1.25rem 1.25rem;
+      padding: 0 var(--card-padding-tablet) var(--card-padding-tablet);
       font-size: 0.875rem;
     }
   }
 
   @media (max-width: 480px) {
     .faq-section {
-      padding: 2rem 0 3rem;
+      padding: var(--section-padding-y-mobile) 0;
     }
 
-    .faq-header {
-      margin-bottom: 2rem;
-    }
-
-    .faq-header h2 {
-      font-size: clamp(1.25rem, 4vw, 1.75rem);
-    }
-
-    .faq-grid {
-      padding: 0 0.75rem;
-    }
-
-    .faq-item summary {
-      padding: 1rem;
-    }
-
-    .faq-question {
-      font-size: 0.875rem;
+    .faq-summary {
+      padding: var(--card-padding-mobile);
     }
 
     .faq-answer {
-      padding: 0 1rem 1rem;
+      padding: 0 var(--card-padding-mobile) var(--card-padding-mobile);
       font-size: 0.8125rem;
     }
   }
@@ -298,18 +249,22 @@ const messages = {
             case "ArrowDown":
               e.preventDefault();
               this.focusNextItem(index);
+              this.announce(messages.navigate);
               break;
             case "ArrowUp":
               e.preventDefault();
               this.focusPreviousItem(index);
+              this.announce(messages.navigate);
               break;
             case "Home":
               e.preventDefault();
               this.focusFirstItem();
+              this.announce(messages.navigate);
               break;
             case "End":
               e.preventDefault();
               this.focusLastItem();
+              this.announce(messages.navigate);
               break;
           }
         });

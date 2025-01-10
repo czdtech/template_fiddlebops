@@ -7,6 +7,10 @@ type EmailAddress = string & { readonly brand: unique symbol };
 export const isNonEmptyString = (value: string): value is NonEmptyString =>
   value.length > 0;
 export const isValidUrl = (value: string): value is ValidUrl => {
+  // 如果是相对路径，直接返回 true
+  if (value.startsWith("/")) return true;
+
+  // 否则验证是否为有效的完整 URL
   try {
     new URL(value);
     return true;
@@ -125,6 +129,22 @@ export interface GameConfig {
     message: NonEmptyString;
     /** 加载超时时间（毫秒） */
     timeout: number;
+    /** 最大重试次数 */
+    maxRetries: number;
+  };
+  /** 错误处理配置 */
+  error: {
+    /** 错误消息 */
+    messages: {
+      /** 超时错误 */
+      timeout: NonEmptyString;
+      /** 资源未找到 */
+      notFound: NonEmptyString;
+      /** 通用错误 */
+      generic: NonEmptyString;
+    };
+    /** 重试间隔（毫秒） */
+    retryInterval: number;
   };
   /** SEO配置 */
   seo: {
@@ -136,3 +156,12 @@ export interface GameConfig {
     keywords: NonEmptyString[];
   };
 }
+
+// 游戏选择器类型
+export type GameSelectors = {
+  wrapper: string;
+  iframe: string;
+  error: string;
+  cover: string;
+  startButton: string;
+};

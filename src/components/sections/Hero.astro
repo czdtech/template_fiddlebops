@@ -1,24 +1,23 @@
 ---
-import { siteConfig } from "@/config/site";
-import {
-  getLangFromUrl,
-  useTranslations,
-  useTranslatedPath,
-} from "@/i18n/utils";
+import { getLangFromUrl, useTranslations } from "@/i18n/utils";
 import ScreenReader from "@/components/a11y/ScreenReader.astro";
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
-const translatePath = useTranslatedPath(lang);
 ---
 
-<section class="hero" aria-labelledby="hero-title" role="banner">
+<section
+  class="hero"
+  aria-labelledby="hero-title"
+  role="banner"
+  aria-describedby="hero-description"
+>
   <div class="container">
     <div class="hero-content">
       <h1 id="hero-title" class="title">
         <span class="gradient-text">{t("hero.title")}</span>
       </h1>
-      <p class="description" aria-label={t("hero.description")}>
+      <p id="hero-description" class="description">
         {t("hero.description")}
       </p>
     </div>
@@ -32,8 +31,8 @@ const translatePath = useTranslatedPath(lang);
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: 20vh;
-    padding: 1.5rem 0;
+    min-height: var(--hero-min-height, 20vh);
+    padding: var(--section-padding-y) 0;
     margin: 0;
     background: var(--color-background-dark);
     overflow: hidden;
@@ -46,49 +45,37 @@ const translatePath = useTranslatedPath(lang);
     left: 0;
     width: 100%;
     height: 100%;
-    background: radial-gradient(
-        circle at 20% 30%,
-        var(--color-primary) 0%,
-        transparent 70%
-      ),
-      radial-gradient(
-        circle at 80% 70%,
-        var(--color-accent) 0%,
-        transparent 70%
-      );
+    background: var(--hero-gradient);
     opacity: 0.15;
     pointer-events: none;
   }
 
   .container {
     width: 100%;
-    max-width: 1200px;
+    max-width: var(--container-max-width);
     margin: 0 auto;
-    padding: 0 1rem;
+    padding: 0 var(--container-padding);
   }
 
   .hero-content {
     position: relative;
     z-index: 1;
     text-align: center;
-    max-width: 800px;
+    max-width: var(--hero-content-max-width, 800px);
     margin: 0 auto;
-    padding: 0 1rem;
+    padding: 0 var(--container-padding);
+    animation: var(--hero-animation);
   }
 
   .title {
     font-size: clamp(2rem, 5vw, 3.5rem);
     line-height: 1.2;
-    margin-bottom: 1.5rem;
+    margin-bottom: var(--spacing-6);
     font-weight: 700;
   }
 
   .gradient-text {
-    background: linear-gradient(
-      to right,
-      var(--color-text),
-      var(--color-text-muted)
-    );
+    background: var(--text-gradient);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -97,9 +84,9 @@ const translatePath = useTranslatedPath(lang);
   .description {
     font-size: clamp(1.1rem, 2vw, 1.25rem);
     line-height: 1.6;
-    margin-bottom: 1rem;
+    margin-bottom: var(--spacing-4);
     color: var(--color-text-muted);
-    max-width: 540px;
+    max-width: var(--hero-description-max-width, 540px);
     margin-left: auto;
     margin-right: auto;
   }
@@ -117,39 +104,53 @@ const translatePath = useTranslatedPath(lang);
 
   @media (max-width: 768px) {
     .hero {
-      min-height: 18vh;
-      padding: 1.25rem 0;
+      min-height: var(--hero-min-height-tablet, 18vh);
+      padding: var(--section-padding-y-tablet) 0;
     }
 
     .hero-content {
-      padding: 0 1rem;
+      padding: 0 var(--container-padding);
     }
 
     .title {
       font-size: clamp(1.5rem, 6vw, 2.5rem);
-      margin-bottom: 1rem;
+      margin-bottom: var(--spacing-4);
     }
 
     .description {
-      font-size: 1rem;
-      margin-bottom: 1.5rem;
-      padding: 0 1rem;
+      font-size: var(--font-size-base);
+      margin-bottom: var(--spacing-6);
+      padding: 0 var(--container-padding);
     }
   }
 
   @media (max-width: 480px) {
     .hero {
-      min-height: 15vh;
-      padding: 1rem 0;
+      min-height: var(--hero-min-height-mobile, 15vh);
+      padding: var(--section-padding-y-mobile) 0;
     }
 
     .title {
       font-size: clamp(1.25rem, 5vw, 2rem);
     }
+  }
 
-    .description {
-      font-size: 0.875rem;
-      padding: 0 0.5rem;
+  @media (prefers-reduced-motion: reduce) {
+    .hero-content {
+      animation: none;
     }
   }
 </style>
+
+<script>
+  // 添加渐入动画
+  document.addEventListener("DOMContentLoaded", () => {
+    const heroContent = document.querySelector(".hero-content");
+    if (heroContent instanceof HTMLElement) {
+      heroContent.style.setProperty(
+        "--hero-animation",
+        "fadeIn 0.8s ease-out forwards"
+      );
+    }
+  });
+</script>
