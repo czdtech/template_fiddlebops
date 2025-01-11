@@ -1,6 +1,10 @@
 ---
+import { getLangFromUrl, useTranslations } from "@/i18n/utils";
+
+type DeviceType = "desktop" | "mobile";
+
 interface Props {
-  deviceType: string;
+  deviceType: DeviceType;
   controls: {
     desktop: string[];
     mobile: string[];
@@ -8,89 +12,87 @@ interface Props {
 }
 
 const { deviceType, controls } = Astro.props;
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+const deviceLabels = {
+  desktop: t("game.instructions.desktop"),
+  mobile: t("game.instructions.mobile"),
+} as const;
 ---
 
-<div class="controls-container">
-  <div class="controls-grid">
-    {
-      deviceType === "desktop" ? (
-        <div class="control-block">
-          <h3>桌面端控制</h3>
-          <ul>
-            {controls.desktop.map((control) => (
-              <li>{control}</li>
-            ))}
-          </ul>
-        </div>
-      ) : (
-        <div class="control-block">
-          <h3>移动端控制</h3>
-          <ul>
-            {controls.mobile.map((control) => (
-              <li>{control}</li>
-            ))}
-          </ul>
-        </div>
-      )
-    }
+<div class="p-6 md:p-4" role="region" aria-label={deviceLabels[deviceType]}>
+  <div class="grid gap-4">
+    <div
+      class="bg-background rounded-lg border border-border p-4 md:p-3"
+      role="list"
+    >
+      <h3
+        class="text-base font-medium text-text mb-2"
+        id={`${deviceType}-controls-title`}
+      >
+        {deviceLabels[deviceType]}
+      </h3>
+      <ul
+        class="space-y-2"
+        role="list"
+        aria-labelledby={`${deviceType}-controls-title`}
+      >
+        {
+          controls[deviceType].map((control) => (
+            <li
+              class="relative pl-5 text-sm text-muted leading-relaxed"
+              role="listitem"
+            >
+              <span class="absolute left-0 text-primary" aria-hidden="true">
+                •
+              </span>
+              {control}
+            </li>
+          ))
+        }
+      </ul>
+    </div>
   </div>
 </div>
 
 <style>
-  .controls-container {
-    padding: 1.5rem;
+  /* 使用CSS变量定义主题颜色 */
+  :root {
+    --color-background: theme(colors.gray.50);
+    --color-border: theme(colors.gray.200);
+    --color-text: theme(colors.gray.900);
+    --color-text-muted: theme(colors.gray.600);
+    --color-primary: theme(colors.indigo.600);
   }
 
-  .controls-grid {
-    display: grid;
-    gap: 1rem;
+  /* 深色模式支持 */
+  :root[data-theme="dark"] {
+    --color-background: theme(colors.gray.800);
+    --color-border: theme(colors.gray.700);
+    --color-text: theme(colors.gray.100);
+    --color-text-muted: theme(colors.gray.400);
+    --color-primary: theme(colors.indigo.400);
   }
 
-  .control-block {
-    background: var(--color-background);
-    padding: 1rem;
-    border-radius: 0.5rem;
-    border: 1px solid var(--color-border);
+  /* 使用Tailwind类替换自定义样式 */
+  .bg-background {
+    background-color: var(--color-background);
   }
 
-  .control-block h3 {
-    font-size: 1rem;
-    margin-bottom: 0.5rem;
+  .border-border {
+    border-color: var(--color-border);
+  }
+
+  .text-text {
     color: var(--color-text);
   }
 
-  .control-block ul {
-    list-style: none;
-    padding: 0;
-  }
-
-  .control-block li {
-    position: relative;
-    padding-left: 1.25rem;
-    margin-bottom: 0.5rem;
-    font-size: 0.875rem;
-    line-height: 1.4;
+  .text-muted {
     color: var(--color-text-muted);
   }
 
-  .control-block li::before {
-    content: "•";
-    position: absolute;
-    left: 0;
+  .text-primary {
     color: var(--color-primary);
-  }
-
-  @media (max-width: 768px) {
-    .controls-container {
-      padding: 1rem;
-    }
-
-    .control-block {
-      padding: 0.75rem;
-    }
-
-    .control-block li {
-      font-size: 0.8125rem;
-    }
   }
 </style>

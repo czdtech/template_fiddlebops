@@ -1,4 +1,16 @@
-export const en = {
+import type { TranslationObject } from "../types";
+
+/**
+ * English translations
+ * @description All UI text in English
+ */
+export const en: TranslationObject = {
+  // Site
+  "site.title": "FiddleBops - An Innovative Music Rhythm Game",
+  "site.description":
+    "Explore endless possibilities in music creation with this unique rhythm game. Simple and intuitive controls, rich musical elements, discover the magic of music through gameplay.",
+
+  // Navigation
   "nav.home": "Home",
   "nav.game": "Game",
   "nav.features": "Features",
@@ -10,6 +22,8 @@ export const en = {
   "nav.languageMenu": "Language Menu",
   "nav.currentLanguage": "Current Language",
   "nav.toggleMenu": "Toggle Menu",
+
+  // Hero Section
   "hero.title": "Explore the Magic of Rhythm in Music",
   "hero.description":
     "FiddleBops is an innovative rhythm game that lets you discover endless possibilities in music. Experience the joy of music creation through simple and intuitive controls.",
@@ -18,6 +32,8 @@ export const en = {
   "hero.actions": "Hero Actions",
   "hero.startGameDescription": "Click to start playing the game",
   "hero.learnMoreDescription": "Learn more about game features",
+
+  // Features Section
   "features.title": "Game Features",
   "features.subtitle": "Explore the unique gaming experience of FiddleBops",
   "features.gameplay.title": "Intuitive Gameplay",
@@ -32,6 +48,8 @@ export const en = {
   "features.difficulty.title": "Progressive Difficulty",
   "features.difficulty.description":
     "Level design from simple to complex helps you improve your skills gradually.",
+
+  // FAQ Section
   "faq.title": "FAQ",
   "faq.subtitle": "Learn more about FiddleBops",
   "faq.q1": "How do I start playing?",
@@ -63,6 +81,8 @@ export const en = {
   "faq.navigate": "Use arrow keys to navigate between questions",
   "faq.list": "Frequently Asked Questions List",
   "faq.press_enter": "Press Enter to toggle answer",
+
+  // Footer Section
   "footer.explore": "Explore the infinite possibilities",
   "footer.game": "Game",
   "footer.features": "Features",
@@ -75,6 +95,8 @@ export const en = {
   "footer.copyright": "© {year} FiddleBops. All rights reserved.",
   "footer.privacy": "Privacy Policy",
   "footer.terms": "Terms of Service",
+
+  // Game Section
   "game.loading": "Loading FiddleBops...",
   "game.frameTitle": "FiddleBops - A Musical Creation Game",
   "game.frameDescription":
@@ -96,6 +118,8 @@ export const en = {
   "game.category.voices": "Voices",
   "game.error": "Failed to load the game",
   "game.retry": "Retry",
+
+  // Orientation Section
   "orientation.title": "Rotate your device for a better gaming experience",
   "orientation.rotate": "Rotate Screen",
   "orientation.continue": "Continue in Current Orientation",
@@ -103,4 +127,18 @@ export const en = {
   "game.instructions.createTitle": "🎮 How to Create",
   "game.instructions.soundTitle": "🎼 Sound Categories",
   "game.instructions.controlTitle": "💫 Controls",
+
+  // Accessibility
+  "a11y.skipToContent": "Skip to main content",
+
+  // Error Pages
+  error: {
+    "404": {
+      title: "Page Not Found",
+      description: "Sorry, the page you are looking for does not exist.",
+      message: "Sorry, the page you are looking for does not exist",
+      help: "The page may have been moved or deleted. Let's get you back to the homepage!",
+      home: "Back to Homepage",
+    },
+  },
 } as const;

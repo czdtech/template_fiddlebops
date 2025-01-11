@@ -1,7 +1,7 @@
 // 通用工具类型
-type NonEmptyString = string & { readonly brand: unique symbol };
-type ValidUrl = string & { readonly brand: unique symbol };
-type EmailAddress = string & { readonly brand: unique symbol };
+export type NonEmptyString = string & { readonly brand: unique symbol };
+export type ValidUrl = string & { readonly brand: unique symbol };
+export type EmailAddress = string & { readonly brand: unique symbol };
 
 // 验证工具函数
 export const isNonEmptyString = (value: string): value is NonEmptyString =>
@@ -165,3 +165,11 @@ export type GameSelectors = {
   cover: string;
   startButton: string;
 };
+
+// 图片相关类型
+export type ValidImageFormat = "avif" | "webp" | "png" | "jpg";
+export type ImageQuality = number & { readonly brand: unique symbol };
+export type BreakpointConfig = Record<string, number>;
+
+export const isValidImageQuality = (value: number): value is ImageQuality =>
+  value >= 1 && value <= 100;

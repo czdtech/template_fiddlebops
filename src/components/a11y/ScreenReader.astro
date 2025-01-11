@@ -14,6 +14,11 @@ const {
   maxHistory = 50,
   class: className = "",
 } = Astro.props;
+
+// 验证 maxHistory 的值
+if (maxHistory < 1) {
+  throw new Error("maxHistory must be greater than 0");
+}
 ---
 
 <screen-reader-announcer
@@ -64,12 +69,19 @@ const {
     private maxSize: number;
 
     constructor(maxSize = 50) {
+      if (maxSize < 1) {
+        throw new Error("maxSize must be greater than 0");
+      }
       this.maxSize = maxSize;
     }
 
     add(
       record: Omit<AnnouncementRecord, "id" | "timestamp">
     ): AnnouncementRecord {
+      if (!record.message) {
+        throw new Error("Message is required");
+      }
+
       const newRecord: AnnouncementRecord = {
         ...record,
         id: crypto.randomUUID(),
@@ -90,6 +102,9 @@ const {
     }
 
     getByCategory(category: string): AnnouncementRecord[] {
+      if (!category) {
+        throw new Error("Category is required");
+      }
       return this.records.filter((record) => record.category === category);
     }
 
@@ -98,6 +113,9 @@ const {
     }
 
     getByTimeRange(start: number, end: number): AnnouncementRecord[] {
+      if (start > end) {
+        throw new Error("Start time must be less than or equal to end time");
+      }
       return this.records.filter(
         (record) => record.timestamp >= start && record.timestamp <= end
       );
@@ -112,13 +130,19 @@ const {
     }
 
     import(data: string): void {
+      if (!data) {
+        throw new Error("Data is required");
+      }
+
       try {
         const parsed = JSON.parse(data);
-        if (Array.isArray(parsed)) {
-          this.records = parsed;
+        if (!Array.isArray(parsed)) {
+          throw new Error("Invalid data format");
         }
+        this.records = parsed;
       } catch (error) {
         console.error("Failed to import announcement history:", error);
+        throw error;
       }
     }
   }
@@ -146,6 +170,10 @@ const {
       category?: string,
       metadata?: Record<string, unknown>
     ) {
+      if (!message) {
+        throw new Error("Message is required");
+      }
+
       const region =
         priority === "polite" ? this.politeRegion : this.assertiveRegion;
 
@@ -163,7 +191,9 @@ const {
 
         // 使用 setTimeout 确保屏幕阅读器能够识别内容变化
         setTimeout(() => {
-          region.textContent = message;
+          if (region) {
+            region.textContent = message;
+          }
         }, 100);
 
         // 触发自定义事件

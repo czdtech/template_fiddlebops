@@ -7,3 +7,13 @@ export type LanguageConfig = {
     locale: string;
   };
 };
+
+export type TranslationValue =
+  | string
+  | {
+      [key: string]: TranslationValue;
+    };
+
+export type TranslationObject = {
+  [key: string]: TranslationValue;
+};

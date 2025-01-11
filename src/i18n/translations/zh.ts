@@ -1,4 +1,16 @@
-export const zh = {
+import type { TranslationObject } from "../types";
+
+/**
+ * Chinese translations
+ * @description All UI text in Chinese (Simplified)
+ */
+export const zh: TranslationObject = {
+  // 站点
+  "site.title": "FiddleBops - 创新的音乐节奏游戏",
+  "site.description":
+    "探索音乐创作的无限可能，体验独特的音乐节奏游戏。简单直观的操作，丰富的音乐元素，让你在游戏中发现音乐的魅力。",
+
+  // 导航
   "nav.home": "首页",
   "nav.game": "游戏",
   "nav.features": "特色",
@@ -10,6 +22,8 @@ export const zh = {
   "nav.languageMenu": "语言菜单",
   "nav.currentLanguage": "当前语言",
   "nav.toggleMenu": "切换菜单",
+
+  // 主页区域
   "hero.title": "在音乐中探索节奏的魅力",
   "hero.description":
     "FiddleBops 是一款创新的音乐节奏游戏，让你在探索中发现音乐的无限可能。通过简单直观的操作，体验音乐创作的乐趣。",
@@ -18,6 +32,8 @@ export const zh = {
   "hero.actions": "主要操作",
   "hero.startGameDescription": "点击开始游戏",
   "hero.learnMoreDescription": "了解更多游戏特色",
+
+  // 特色区域
   "features.title": "游戏特色",
   "features.subtitle": "探索FiddleBops独特的游戏体验",
   "features.gameplay.title": "直观的游戏玩法",
@@ -32,6 +48,8 @@ export const zh = {
   "features.difficulty.title": "渐进式难度",
   "features.difficulty.description":
     "从简单到复杂的关卡设计，让你循序渐进地提升技能。",
+
+  // 常见问题区域
   "faq.title": "常见问题",
   "faq.subtitle": "了解更多关于FiddleBops的信息",
   "faq.q1": "如何开始游戏？",
@@ -62,6 +80,8 @@ export const zh = {
   "faq.navigate": "使用方向键在问题之间导航",
   "faq.list": "常见问题列表",
   "faq.press_enter": "按 Enter 键切换答案",
+
+  // 页脚区域
   "footer.explore": "探索音乐的无限可能",
   "footer.game": "游戏",
   "footer.features": "特色",
@@ -74,6 +94,8 @@ export const zh = {
   "footer.copyright": "© {year} FiddleBops。保留所有权利。",
   "footer.privacy": "隐私政策",
   "footer.terms": "服务条款",
+
+  // 游戏区域
   "game.loading": "FiddleBops 加载中...",
   "game.frameTitle": "FiddleBops - 音乐创作游戏",
   "game.frameDescription": "基于 Incredibox 的互动音乐创作界面",
@@ -92,6 +114,8 @@ export const zh = {
   "game.category.voices": "人声",
   "game.error": "游戏加载失败",
   "game.retry": "重试",
+
+  // 屏幕方向区域
   "orientation.title": "建议旋转设备以获得更好的游戏体验",
   "orientation.rotate": "旋转屏幕",
   "orientation.continue": "继续当前方向",
@@ -99,4 +123,18 @@ export const zh = {
   "game.instructions.createTitle": "🎮 创作方式",
   "game.instructions.soundTitle": "🎼 音效类别",
   "game.instructions.controlTitle": "💫 操作方式",
+
+  // 无障碍
+  "a11y.skipToContent": "跳转到主要内容",
+
+  // Error Pages
+  error: {
+    "404": {
+      title: "页面未找到",
+      description: "抱歉,您访问的页面不存在。",
+      message: "抱歉,您访问的页面不存在",
+      help: "该页面可能已被移动或删除。让我们返回首页吧!",
+      home: "返回首页",
+    },
+  },
 } as const;

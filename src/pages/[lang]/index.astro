@@ -1,5 +1,9 @@
 ---
+import type { Language } from "@/i18n/types";
 import { languages, defaultLang } from "@/i18n/config";
+import { siteConfig } from "@/config/site";
+import { generateGameSchema } from "@/utils/schema";
+import { useTranslations } from "@/i18n/utils";
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import Hero from "@/components/sections/Hero.astro";
 import GameEmbed from "@/components/sections/GameEmbed.astro";
@@ -12,17 +16,51 @@ export function getStaticPaths() {
   }));
 }
 
-const { lang } = Astro.params;
+const { lang } = Astro.params as { lang: Language };
+
+// 验证语言参数
+if (!languages[lang]) {
+  return new Response(null, {
+    status: 404,
+    statusText: "Not Found",
+  });
+}
 
 // 如果访问默认语言的URL，重定向到根路径
 if (lang === defaultLang) {
   return Astro.redirect("/");
 }
+
+// 页面元数据
+const t = useTranslations(lang);
+const title = t("site.title");
+const description = t("site.description");
+const canonicalURL = new URL(Astro.url.pathname, siteConfig.url);
+
+// 生成结构化数据
+const gameSchema = generateGameSchema(siteConfig, canonicalURL);
+
+// 页面属性
+const props = {
+  title,
+  description,
+  canonicalURL,
+  schema: gameSchema,
+  lang,
+};
 ---
 
-<BaseLayout>
-  <Hero />
-  <GameEmbed />
-  <Features />
-  <FAQ />
+<BaseLayout {...props}>
+  <main id="main">
+    <Hero />
+    <GameEmbed />
+    <Features />
+    <FAQ />
+  </main>
 </BaseLayout>
+
+<style>
+  main {
+    @apply flex flex-col gap-16 md:gap-24;
+  }
+</style>

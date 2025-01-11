@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type { Language } from "@/i18n/types";
+import type { Language } from "../../i18n/types";
 
 interface LanguageOption {
   langCode: Language;

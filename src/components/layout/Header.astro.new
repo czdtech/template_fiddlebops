@@ -77,23 +77,22 @@ const translatePath = useTranslatedPath(lang);
   </div>
 </header>
 
-<script is:inline>
-  function initMobileMenu() {
-    const button = document.querySelector(
-      'button[aria-controls="mobile-menu"]'
-    );
-    const menu = document.getElementById("mobile-menu");
-
-    if (button && menu) {
-      button.addEventListener("click", () => {
-        const isExpanded = button.getAttribute("aria-expanded") === "true";
-        button.setAttribute("aria-expanded", (!isExpanded).toString());
-        menu.toggleAttribute("hidden");
-      });
-    }
+<script>
+class MobileMenu {
+  constructor() {
+    this.button = document.querySelector('button[aria-controls="mobile-menu"]');
+    this.menu = document.getElementById('mobile-menu');
+    this.button?.addEventListener('click', () => this.toggleMenu());
   }
 
-  document.addEventListener("DOMContentLoaded", initMobileMenu);
+  toggleMenu() {
+    const isExpanded = this.button?.getAttribute('aria-expanded') === 'true';
+    this.button?.setAttribute('aria-expanded', (!isExpanded).toString());
+    this.menu?.toggleAttribute('hidden');
+  }
+}
+
+new MobileMenu();
 </script>
 
 <style>
@@ -251,4 +250,4 @@ const translatePath = useTranslatedPath(lang);
     color: var(--color-primary);
     font-weight: 500;
   }
-</style>
+</style> 

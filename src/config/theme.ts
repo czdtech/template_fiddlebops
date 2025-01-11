@@ -1,4 +1,212 @@
-export const themeConfig = {
+// 主题配置类型定义
+type RGB = `${number}, ${number}, ${number}`;
+type HexColor = `#${string}`;
+type RGBAColor = `rgba(${RGB}, ${number})`;
+type ThemeColor = HexColor | RGBAColor;
+
+interface ColorConfig {
+  DEFAULT: ThemeColor;
+  rgb?: RGB;
+  lighter?: ThemeColor;
+  darker?: ThemeColor;
+  "darker-rgb"?: RGB;
+}
+
+interface ThemeColors {
+  primary: ColorConfig;
+  secondary: ThemeColor;
+  background: {
+    DEFAULT: ThemeColor;
+    dark: ThemeColor;
+    light: ThemeColor;
+  };
+  text: {
+    DEFAULT: ThemeColor;
+    primary: ThemeColor;
+    muted: ThemeColor;
+  };
+  accent: {
+    DEFAULT: ThemeColor;
+    blue: ThemeColor;
+    green: ThemeColor;
+    yellow: ThemeColor;
+    red: ThemeColor;
+  };
+  card: {
+    DEFAULT: RGBAColor;
+    hover: RGBAColor;
+  };
+}
+
+interface ThemeConfig {
+  colors: ThemeColors;
+  breakpoints: {
+    sm: string;
+    md: string;
+    lg: string;
+    xl: string;
+    "2xl": string;
+  };
+  spacing: {
+    container: {
+      padding: string;
+      maxWidth: string;
+    };
+    section: {
+      padding: string;
+    };
+  };
+  animation: {
+    duration: {
+      fast: string;
+      normal: string;
+      slow: string;
+    };
+    timing: {
+      bounce: string;
+      smooth: string;
+    };
+  };
+  shadows: {
+    sm: string;
+    md: string;
+    lg: string;
+  };
+  typography: {
+    fontFamily: {
+      display: string;
+      body: string;
+    };
+    fontSize: {
+      xs: string;
+      sm: string;
+      base: string;
+      lg: string;
+      xl: string;
+      "2xl": string;
+      "3xl": string;
+      "4xl": string;
+      "5xl": string;
+    };
+  };
+}
+
+// 验证函数
+function isValidHexColor(color: string): color is HexColor {
+  return /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(color);
+}
+
+function isValidRGBA(color: string): color is RGBAColor {
+  return /^rgba\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*,\s*(?:0|1|0?\.\d+)\s*\)$/.test(
+    color
+  );
+}
+
+function isValidThemeColor(color: string): color is ThemeColor {
+  return isValidHexColor(color) || isValidRGBA(color);
+}
+
+function isValidSpacing(value: string): boolean {
+  return /^\d+(?:px|rem|em)$/.test(value);
+}
+
+function validateThemeConfig(config: ThemeConfig): void {
+  // 验证颜色配置
+  const validateColors = (colors: ThemeColors) => {
+    // 验证主色调
+    if (!isValidThemeColor(colors.primary.DEFAULT)) {
+      throw new Error("Invalid primary color");
+    }
+    if (colors.primary.lighter && !isValidThemeColor(colors.primary.lighter)) {
+      throw new Error("Invalid primary lighter color");
+    }
+    if (colors.primary.darker && !isValidThemeColor(colors.primary.darker)) {
+      throw new Error("Invalid primary darker color");
+    }
+
+    // 验证次要色调
+    if (!isValidThemeColor(colors.secondary)) {
+      throw new Error("Invalid secondary color");
+    }
+
+    // 验证背景色
+    if (!isValidThemeColor(colors.background.DEFAULT)) {
+      throw new Error("Invalid background color");
+    }
+    if (!isValidThemeColor(colors.background.dark)) {
+      throw new Error("Invalid dark background color");
+    }
+    if (!isValidThemeColor(colors.background.light)) {
+      throw new Error("Invalid light background color");
+    }
+
+    // 验证文本颜色
+    if (!isValidThemeColor(colors.text.DEFAULT)) {
+      throw new Error("Invalid text color");
+    }
+    if (!isValidThemeColor(colors.text.primary)) {
+      throw new Error("Invalid primary text color");
+    }
+    if (!isValidThemeColor(colors.text.muted)) {
+      throw new Error("Invalid muted text color");
+    }
+
+    // 验证强调色
+    if (!isValidThemeColor(colors.accent.DEFAULT)) {
+      throw new Error("Invalid accent color");
+    }
+    if (!isValidThemeColor(colors.accent.blue)) {
+      throw new Error("Invalid blue accent color");
+    }
+    if (!isValidThemeColor(colors.accent.green)) {
+      throw new Error("Invalid green accent color");
+    }
+    if (!isValidThemeColor(colors.accent.yellow)) {
+      throw new Error("Invalid yellow accent color");
+    }
+    if (!isValidThemeColor(colors.accent.red)) {
+      throw new Error("Invalid red accent color");
+    }
+
+    // 验证卡片颜色
+    if (!isValidRGBA(colors.card.DEFAULT)) {
+      throw new Error("Invalid card color");
+    }
+    if (!isValidRGBA(colors.card.hover)) {
+      throw new Error("Invalid card hover color");
+    }
+  };
+
+  validateColors(config.colors);
+
+  // 验证断点配置
+  Object.values(config.breakpoints).forEach((value) => {
+    if (!/^\d+px$/.test(value)) {
+      throw new Error(`Invalid breakpoint value: ${value}`);
+    }
+  });
+
+  // 验证间距配置
+  if (!isValidSpacing(config.spacing.container.padding)) {
+    throw new Error("Invalid container padding");
+  }
+  if (!isValidSpacing(config.spacing.container.maxWidth)) {
+    throw new Error("Invalid container max width");
+  }
+  if (!isValidSpacing(config.spacing.section.padding)) {
+    throw new Error("Invalid section padding");
+  }
+
+  // 验证动画配置
+  Object.values(config.animation.duration).forEach((value) => {
+    if (!/^\d+ms$/.test(value)) {
+      throw new Error(`Invalid animation duration: ${value}`);
+    }
+  });
+}
+
+// 主题配置
+export const themeConfig: ThemeConfig = {
   colors: {
     primary: {
       DEFAULT: "#6366f1",
@@ -7,31 +215,29 @@ export const themeConfig = {
       darker: "#4f46e5",
       "darker-rgb": "79, 70, 229",
     },
-    secondary: "#10b981", // 绿色作为次要色调
+    secondary: "#10b981",
     background: {
-      DEFAULT: "#0a0a0a", // 默认背景色
-      dark: "#0a0a0a", // 深色背景
-      light: "#1a1a1a", // 稍浅的背景，用于卡片等元素
+      DEFAULT: "#0a0a0a",
+      dark: "#0a0a0a",
+      light: "#1a1a1a",
     },
     text: {
-      DEFAULT: "#ffffff", // 默认文本颜色
-      primary: "#ffffff", // 主要文本颜色
-      muted: "#a3a3a3", // 次要文本颜色
+      DEFAULT: "#ffffff",
+      primary: "#ffffff",
+      muted: "#a3a3a3",
     },
     accent: {
-      DEFAULT: "#3b82f6", // 默认强调色
-      blue: "#60a5fa", // 强调色 - 蓝色
-      green: "#34d399", // 强调色 - 绿色
-      yellow: "#fbbf24", // 强调色 - 黄色
-      red: "#ef4444", // 强调色 - 红色
+      DEFAULT: "#3b82f6",
+      blue: "#60a5fa",
+      green: "#34d399",
+      yellow: "#fbbf24",
+      red: "#ef4444",
     },
     card: {
-      DEFAULT: "rgba(26, 26, 26, 0.8)", // 默认卡片背景色
-      hover: "rgba(26, 26, 26, 0.9)", // 卡片悬停背景色
+      DEFAULT: "rgba(26, 26, 26, 0.8)",
+      hover: "rgba(26, 26, 26, 0.9)",
     },
   },
-
-  // 响应式断点配置
   breakpoints: {
     sm: "640px",
     md: "768px",
@@ -39,19 +245,15 @@ export const themeConfig = {
     xl: "1280px",
     "2xl": "1536px",
   },
-
-  // 间距配置
   spacing: {
     container: {
       padding: "1rem",
       maxWidth: "1280px",
     },
     section: {
-      padding: "4rem 0",
+      padding: "4rem",
     },
   },
-
-  // 动画配置
   animation: {
     duration: {
       fast: "150ms",
@@ -63,15 +265,11 @@ export const themeConfig = {
       smooth: "cubic-bezier(0.4, 0, 0.2, 1)",
     },
   },
-
-  // 阴影配置
   shadows: {
     sm: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
     md: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
     lg: "0 10px 15px -3px rgb(0 0 0 / 0.1)",
   },
-
-  // 字体配置
   typography: {
     fontFamily: {
       display: "Bangers",
@@ -90,3 +288,8 @@ export const themeConfig = {
     },
   },
 } as const;
+// 验证主题配置
+validateThemeConfig(themeConfig);
+
+// 导出只读配置
+export const theme: Readonly<typeof themeConfig> = themeConfig;

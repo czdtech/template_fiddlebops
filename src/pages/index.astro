@@ -1,18 +1,41 @@
 ---
+import type { SiteConfig } from "@/config/types";
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import Hero from "@/components/sections/Hero.astro";
 import GameEmbed from "@/components/sections/GameEmbed.astro";
 import Features from "@/components/sections/Features.astro";
 import FAQ from "@/components/sections/FAQ.astro";
 import { siteConfig } from "@/config/site";
+import { generateGameSchema } from "@/utils/schema";
 
+// 页面元数据
 const title = siteConfig.title;
 const description = siteConfig.description;
+const canonicalURL = new URL(Astro.url.pathname, siteConfig.url);
+
+// 生成结构化数据
+const gameSchema = generateGameSchema(siteConfig, canonicalURL);
+
+// 页面属性
+const props = {
+  title,
+  description,
+  canonicalURL,
+  schema: gameSchema,
+};
 ---
 
-<BaseLayout {title} {description}>
-  <Hero />
-  <GameEmbed />
-  <Features />
-  <FAQ />
+<BaseLayout {...props}>
+  <main id="main">
+    <Hero />
+    <GameEmbed />
+    <Features />
+    <FAQ />
+  </main>
 </BaseLayout>
+
+<style>
+  main {
+    @apply flex flex-col gap-16 md:gap-24;
+  }
+</style>

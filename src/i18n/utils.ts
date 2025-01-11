@@ -13,14 +13,15 @@ type UiKey = keyof UiType;
 export function useTranslations(lang: Languages) {
   return function t(
     key: UiKey,
-    params?: Record<string, string | number>
+    params?: Record<string, string | number>,
+    manualParams?: string[]
   ): string {
     const text = (ui[lang][key] ?? ui[defaultLang][key]) as string;
 
     // 开发环境检查
     if (import.meta.env.DEV) {
       checkTranslationKey(lang, key, ui);
-      checkTranslationParams(key, text, params);
+      checkTranslationParams(key, text, params, manualParams);
     }
 
     if (params) {

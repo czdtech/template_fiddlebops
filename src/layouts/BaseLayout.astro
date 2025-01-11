@@ -1,15 +1,18 @@
 ---
+import type { SiteConfig } from "@/config/types";
 import { siteConfig } from "@/config/site";
 import Header from "@/components/layout/Header.astro";
 import Footer from "@/components/layout/Footer.astro";
 import "@/styles/global.css";
-import { getLangFromUrl } from "@/i18n/utils";
+import { getLangFromUrl, useTranslations } from "@/i18n/utils";
+import { generateGameSchema } from "@/utils/schema";
 
 interface Props {
   title?: string;
   description?: string;
   image?: string;
   canonicalURL?: URL | string;
+  schema?: Record<string, unknown>;
 }
 
 const {
@@ -17,12 +20,19 @@ const {
   description = siteConfig.description,
   image = siteConfig.ogImage,
   canonicalURL = new URL(Astro.url.pathname, Astro.site),
+  schema = generateGameSchema(siteConfig, canonicalURL as URL),
 } = Astro.props;
 
 const formattedTitle =
   title === siteConfig.title ? title : `${title} | ${siteConfig.title}`;
 
 const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+// Validate required meta tags
+if (!title || !description || !image) {
+  throw new Error("Missing required meta tags");
+}
 ---
 
 <!doctype html>
@@ -30,9 +40,13 @@ const lang = getLangFromUrl(Astro.url);
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#000000" />
+    <meta name="color-scheme" content="dark light" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>{formattedTitle}</title>
     <meta name="description" content={description} />
+    <meta name="author" content={siteConfig.creator.name} />
+    <meta name="keywords" content={siteConfig.keywords.join(", ")} />
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
@@ -40,6 +54,8 @@ const lang = getLangFromUrl(Astro.url);
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:image" content={image} />
+    <meta property="og:site_name" content={siteConfig.name} />
+    <meta property="og:locale" content={lang === "zh" ? "zh_CN" : "en_US"} />
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image" />
@@ -47,6 +63,7 @@ const lang = getLangFromUrl(Astro.url);
     <meta property="twitter:title" content={title} />
     <meta property="twitter:description" content={description} />
     <meta property="twitter:image" content={image} />
+    <meta property="twitter:creator" content={siteConfig.creator.twitter} />
 
     <!-- Canonical URL -->
     <link rel="canonical" href={canonicalURL} />
@@ -58,11 +75,17 @@ const lang = getLangFromUrl(Astro.url);
     <link rel="alternate" href="/" hreflang="en" />
     <link rel="alternate" href="/zh" hreflang="zh" />
     <link rel="alternate" href="/" hreflang="x-default" />
+
+    <!-- Structured Data -->
+    <script type="application/ld+json" set:html={JSON.stringify(schema)} />
   </head>
   <body>
     <div class="layout">
+      <a href="#main-content" class="sr-only focus:not-sr-only">
+        {t("a11y.skipToContent")}
+      </a>
       <Header />
-      <main class="main">
+      <main id="main-content" class="main" role="main">
         <slot />
       </main>
       <Footer />
@@ -112,6 +135,37 @@ const lang = getLangFromUrl(Astro.url);
       /* Ensure footer sticks to bottom */
       footer {
         margin-top: auto;
+      }
+
+      /* Skip to content link */
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+      }
+
+      .focus\:not-sr-only:focus {
+        position: fixed;
+        top: 1rem;
+        left: 1rem;
+        z-index: 50;
+        width: auto;
+        height: auto;
+        padding: 0.5rem 1rem;
+        margin: 0;
+        overflow: visible;
+        clip: auto;
+        white-space: normal;
+        background: var(--color-background);
+        color: var(--color-text);
+        border: 2px solid var(--color-primary);
+        border-radius: 0.25rem;
       }
     </style>
   </body>

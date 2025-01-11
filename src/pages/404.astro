@@ -1,67 +1,50 @@
 ---
 import BaseLayout from "@/layouts/BaseLayout.astro";
+import Container from "@/components/layout/Container.astro";
 import { siteConfig } from "@/config/site";
+import { getLangFromUrl, useTranslations } from "@/i18n/utils";
 
-const title = "页面未找到 | " + siteConfig.title;
-const description = "抱歉，您访问的页面不存在。";
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+const title = `${t("error.404.title")} | ${siteConfig.title}`;
+const description = t("error.404.description");
 ---
 
 <BaseLayout {title} {description}>
-  <section class="error-page">
-    <div class="container">
-      <div class="error-content">
-        <h1>404</h1>
-        <p class="error-message">抱歉，您访问的页面不存在</p>
-        <p class="error-description">
-          页面可能已被移动或删除。让我们带您回到首页继续探索吧！
+  <section
+    class="min-h-[calc(100vh-var(--header-height))] flex items-center justify-center py-8 text-center"
+    role="main"
+    aria-labelledby="error-title"
+  >
+    <Container>
+      <div class="max-w-[600px] mx-auto animate-fade-in">
+        <h1
+          id="error-title"
+          class="text-[clamp(6rem,20vw,12rem)] leading-none bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent mb-4"
+        >
+          404
+        </h1>
+        <p class="text-[clamp(1.5rem,4vw,2rem)] mb-4 text-text">
+          {t("error.404.message")}
         </p>
-        <a href="/" class="button">返回首页</a>
+        <p class="text-lg mb-8 text-text-muted">
+          {t("error.404.help")}
+        </p>
+        <a
+          href="/"
+          class="button"
+          role="button"
+          aria-label={t("error.404.home")}
+        >
+          {t("error.404.home")}
+        </a>
       </div>
-    </div>
+    </Container>
   </section>
 </BaseLayout>
 
 <style>
-  .error-page {
-    min-height: calc(100vh - var(--header-height));
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 2rem 0;
-    text-align: center;
-  }
-
-  .error-content {
-    max-width: 600px;
-    margin: 0 auto;
-    animation: fade-in 0.5s ease-out;
-  }
-
-  h1 {
-    font-size: clamp(6rem, 20vw, 12rem);
-    line-height: 1;
-    background: linear-gradient(
-      to right,
-      var(--color-primary),
-      var(--color-accent)
-    );
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    margin-bottom: 1rem;
-  }
-
-  .error-message {
-    font-size: clamp(1.5rem, 4vw, 2rem);
-    margin-bottom: 1rem;
-    color: var(--color-text);
-  }
-
-  .error-description {
-    font-size: 1.125rem;
-    margin-bottom: 2rem;
-    color: var(--color-text-muted);
-  }
-
   @keyframes fade-in {
     from {
       opacity: 0;
@@ -73,8 +56,12 @@ const description = "抱歉，您访问的页面不存在。";
     }
   }
 
+  .animate-fade-in {
+    animation: fade-in 0.5s ease-out;
+  }
+
   @media (max-width: 640px) {
-    .error-page {
+    section {
       padding: 1rem;
     }
   }

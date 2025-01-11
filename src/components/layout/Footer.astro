@@ -1,234 +1,121 @@
 ---
+import { useTranslations, getLangFromUrl } from "@/i18n/utils";
 import { siteConfig } from "@/config/site";
-import {
-  getLangFromUrl,
-  useTranslations,
-  useTranslatedPath,
-} from "@/i18n/utils";
+import Container from "./Container.astro";
 
-const currentYear = new Date().getFullYear();
+type FooterLink = {
+  text: string;
+  href: string;
+  external: boolean;
+};
+
+type FooterSection = {
+  title: string;
+  links: FooterLink[];
+};
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
-const translatePath = useTranslatedPath(lang);
 
-const footerLinks = [
-  {
+const footerLinks = {
+  game: {
     title: t("footer.game"),
     links: [
-      { text: t("nav.startGame"), href: translatePath("/#game") },
-      { text: t("nav.features"), href: translatePath("/#features") },
-      { text: t("nav.faq"), href: translatePath("/#faq") },
+      { text: t("nav.home"), href: "/", external: false },
+      { text: t("nav.game"), href: "/game", external: false },
+      { text: t("nav.features"), href: "/features", external: false },
+      { text: t("nav.faq"), href: "/faq", external: false },
     ],
   },
-  {
+  community: {
     title: t("footer.community"),
     links: [
-      { text: "Discord", href: "https://discord.gg/fiddlebops" },
-      { text: "Twitter", href: "https://twitter.com/fiddlebops" },
-      { text: "GitHub", href: "https://github.com/silkycell/fiddlebops" },
+      { text: "Discord", href: siteConfig.links.discord, external: true },
+      { text: "Twitter", href: siteConfig.links.twitter, external: true },
+      { text: "GitHub", href: siteConfig.links.github, external: true },
     ],
   },
-  {
+  support: {
     title: t("footer.support"),
     links: [
-      { text: t("footer.helpCenter"), href: translatePath("/help") },
-      { text: t("footer.contact"), href: translatePath("/contact") },
-      { text: t("footer.feedback"), href: translatePath("/feedback") },
+      { text: t("footer.helpCenter"), href: "/help", external: false },
+      { text: t("footer.contact"), href: "/contact", external: false },
+      { text: t("footer.feedback"), href: "/feedback", external: false },
     ],
   },
-];
+} as const;
+
+const currentYear = new Date().getFullYear();
 ---
 
-<footer class="footer">
-  <div class="container">
-    <div class="footer-content">
-      <div class="footer-brand">
-        <a href={translatePath("/")} class="footer-logo">
-          <img src="/logo.svg" alt="FiddleBops" width="32" height="32" />
-          <span>FiddleBops</span>
+<footer
+  class="bg-gray-900 text-gray-300 py-12"
+  role="contentinfo"
+  aria-label={t("footer.explore")}
+>
+  <Container>
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+      <div class="space-y-4">
+        <a href="/" class="inline-block" aria-label="FiddleBops">
+          <img
+            src="/logo.svg"
+            alt="FiddleBops"
+            class="h-8"
+            width="120"
+            height="32"
+          />
         </a>
-        <p class="footer-description">{t("footer.explore")}</p>
+        <p class="text-sm">{t("footer.explore")}</p>
       </div>
 
-      <div class="footer-links">
-        {
-          footerLinks.map((section) => (
-            <div class="footer-section">
-              <h3>{section.title}</h3>
-              <ul>
-                {section.links.map((link) => (
-                  <li>
-                    <a href={link.href}>{link.text}</a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))
-        }
-      </div>
+      {
+        Object.values(footerLinks).map((section) => (
+          <div class="space-y-4">
+            <h2 class="font-semibold text-white">{section.title}</h2>
+            <ul class="space-y-2" role="list">
+              {section.links.map((link) => (
+                <li>
+                  <a
+                    href={link.href}
+                    class="text-sm hover:text-white transition-colors"
+                    target={link.external ? "_blank" : undefined}
+                    rel={link.external ? "noopener noreferrer" : undefined}
+                  >
+                    {link.text}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))
+      }
     </div>
 
-    <div class="footer-bottom">
-      <p class="copyright">
-        {t("footer.copyright", { year: currentYear })}
-      </p>
-      <div class="legal-links">
-        <a href={translatePath("/privacy")}>{t("footer.privacy")}</a>
-        <a href={translatePath("/terms")}>{t("footer.terms")}</a>
+    <div class="mt-12 pt-8 border-t border-gray-800">
+      <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+        <p class="text-sm">
+          {
+            t("footer.copyright", undefined, ["year"]).replace(
+              "{year}",
+              currentYear.toString()
+            )
+          }
+        </p>
+        <div class="flex gap-6">
+          <a href="/privacy" class="text-sm hover:text-white transition-colors">
+            {t("footer.privacy")}
+          </a>
+          <a href="/terms" class="text-sm hover:text-white transition-colors">
+            {t("footer.terms")}
+          </a>
+        </div>
       </div>
     </div>
-  </div>
+  </Container>
 </footer>
 
 <style>
-  .footer {
-    background: var(--color-background-dark);
-    padding: 4rem 0 2rem;
-    color: var(--color-text-muted);
-    margin-top: 0;
-  }
-
-  .container {
-    width: 100%;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 1rem;
-  }
-
-  .footer-content {
-    display: grid;
-    grid-template-columns: 300px 1fr;
-    gap: 3rem;
-    margin-bottom: 3rem;
-  }
-
-  .footer-brand {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-  }
-
-  .footer-logo {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    color: var(--color-text);
-    font-size: 1.5rem;
-    font-weight: 600;
-    text-decoration: none;
-  }
-
-  .footer-description {
-    max-width: 300px;
-    line-height: 1.6;
-  }
-
-  .footer-links {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 2rem;
-  }
-
-  .footer-section h3 {
-    color: var(--color-text);
-    font-size: 1.125rem;
-    font-weight: 600;
-    margin-bottom: 1rem;
-  }
-
-  .footer-section ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
-
-  .footer-section li {
-    margin-bottom: 0.5rem;
-  }
-
-  .footer-section a {
-    color: var(--color-text-muted);
-    text-decoration: none;
-    transition: color 0.2s ease;
-  }
-
-  .footer-section a:hover {
-    color: var(--color-primary);
-  }
-
-  .footer-bottom {
-    padding-top: 2rem;
-    border-top: 1px solid var(--color-border);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-
-  .copyright {
-    font-size: 0.875rem;
-  }
-
-  .legal-links {
-    display: flex;
-    gap: 1.5rem;
-  }
-
-  .legal-links a {
-    font-size: 0.875rem;
-    color: var(--color-text-muted);
-    text-decoration: none;
-    transition: color 0.2s ease;
-  }
-
-  .legal-links a:hover {
-    color: var(--color-primary);
-  }
-
-  @media (max-width: 768px) {
-    .footer {
-      padding: 3rem 0 1.5rem;
-    }
-
-    .footer-content {
-      grid-template-columns: 1fr;
-      gap: 2rem;
-      margin-bottom: 2rem;
-    }
-
-    .footer-links {
-      grid-template-columns: repeat(2, 1fr);
-      gap: 1.5rem;
-    }
-
-    .footer-bottom {
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      gap: 1rem;
-    }
-  }
-
-  @media (max-width: 480px) {
-    .footer {
-      padding: 2rem 0 1rem;
-    }
-
-    .footer-links {
-      grid-template-columns: 1fr;
-      gap: 1.5rem;
-    }
-
-    .footer-section {
-      text-align: center;
-    }
-
-    .footer-section h3 {
-      font-size: 1rem;
-    }
-
-    .footer-section li {
-      margin-bottom: 0.75rem;
-    }
+  footer {
+    border-top: 1px solid rgb(31 41 55);
   }
 </style>

@@ -1,13 +1,13 @@
 ---
-import { languages } from "@/i18n/config";
+import { languages } from "../../i18n/config";
 import {
   getLangFromUrl,
   useTranslations,
   useTranslatedPath,
-} from "@/i18n/utils";
+} from "../../i18n/utils";
 import LanguageSelectorClient from "./LanguageSelectorClient";
-import type { Language } from "@/i18n/types";
-import ScreenReader from "@/components/a11y/ScreenReader.astro";
+import type { Language } from "../../i18n/types";
+import ScreenReader from "../a11y/ScreenReader.astro";
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
@@ -38,7 +38,7 @@ const props = {
 ---
 
 <div class="language-selector-wrapper">
-  <LanguageSelectorClient {...props} />
+  <LanguageSelectorClient client:load {...props} />
   <ScreenReader>
     {t("nav.currentLanguage")}: {languages[lang as Language].name}
   </ScreenReader>
