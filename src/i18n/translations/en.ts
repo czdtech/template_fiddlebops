@@ -48,6 +48,17 @@ export const en: TranslationObject = {
   "features.difficulty.title": "Progressive Difficulty",
   "features.difficulty.description":
     "Level design from simple to complex helps you improve your skills gradually.",
+  "features.realtime.title": "Real-time Music Creation",
+  "features.realtime.description":
+    "Create unique musical rhythms through clicks and drags",
+  "features.devices.title": "Multi-device Support",
+  "features.devices.description":
+    "Enjoy a smooth gaming experience on any device",
+  "features.share.title": "Social Sharing",
+  "features.share.description": "Share your musical creations with friends",
+  "features.sound.title": "Custom Sound Effects",
+  "features.sound.description":
+    "Choose and combine different sound effects to create music",
 
   // FAQ Section
   "faq.title": "FAQ",
@@ -141,4 +152,12 @@ export const en: TranslationObject = {
       home: "Back to Homepage",
     },
   },
+
+  "error.404.title": "Page Not Found",
+  "error.404.description":
+    "Sorry, the page you are looking for does not exist.",
+  "error.404.message": "Sorry, the page you are looking for does not exist",
+  "error.404.help":
+    "The page may have been moved or deleted. Let's get you back to the homepage!",
+  "error.404.home": "Back to Homepage",
 } as const;
