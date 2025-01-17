@@ -1,5 +1,4 @@
 ---
-import type { SiteConfig } from "@/config/types";
 import { siteConfig } from "@/config/site";
 import Header from "@/components/layout/Header.astro";
 import Footer from "@/components/layout/Footer.astro";
@@ -63,7 +62,7 @@ if (!title || !description || !image) {
     <meta property="twitter:title" content={title} />
     <meta property="twitter:description" content={description} />
     <meta property="twitter:image" content={image} />
-    <meta property="twitter:creator" content={siteConfig.creator.twitter} />
+    <meta property="twitter:creator" content={siteConfig.links.twitter} />
 
     <!-- Canonical URL -->
     <link rel="canonical" href={canonicalURL} />

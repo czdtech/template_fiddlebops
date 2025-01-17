@@ -1,5 +1,4 @@
 ---
-import type { SiteConfig } from "@/config/types";
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import Hero from "@/components/sections/Hero.astro";
 import GameEmbed from "@/components/sections/GameEmbed.astro";
@@ -17,15 +16,16 @@ const canonicalURL = new URL(Astro.url.pathname, siteConfig.url);
 const gameSchema = generateGameSchema(siteConfig, canonicalURL);
 
 // 页面属性
-const props = {
-  title,
-  description,
-  canonicalURL,
-  schema: gameSchema,
+const layoutProps = {
+  title: String(title),
+  description: String(description),
+  canonicalURL: canonicalURL.toString(),
+  schema: gameSchema as unknown as Record<string, unknown>,
+  image: String(siteConfig.ogImage),
 };
 ---
 
-<BaseLayout {...props}>
+<BaseLayout {...layoutProps}>
   <main id="main">
     <Hero />
     <GameEmbed />
