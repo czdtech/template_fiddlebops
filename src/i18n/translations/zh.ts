@@ -35,19 +35,26 @@ export const zh: TranslationObject = {
 
   // 特色区域
   "features.title": "游戏特色",
-  "features.subtitle": "探索FiddleBops独特的游戏体验",
+  "features.subtitle": "探索 FiddleBops 独特的游戏体验",
   "features.gameplay.title": "直观的游戏玩法",
   "features.gameplay.description":
-    "简单易上手的操作方式，让你专注于音乐创作的乐趣。",
+    "简单易学的控制方式，让你专注于音乐创作的乐趣。",
   "features.music.title": "丰富的音乐元素",
-  "features.music.description":
-    "多样化的音乐素材和节奏组合，激发你的创作灵感。",
+  "features.music.description": "多样的音乐素材和节奏组合，激发你的创造力。",
   "features.feedback.title": "实时反馈",
   "features.feedback.description":
     "即时的视觉和听觉反馈，帮助你更好地理解音乐节奏。",
   "features.difficulty.title": "渐进式难度",
   "features.difficulty.description":
-    "从简单到复杂的关卡设计，让你循序渐进地提升技能。",
+    "从简单到复杂的关卡设计，帮助你逐步提升技能。",
+  "features.realtime.title": "实时音乐创作",
+  "features.realtime.description": "通过点击和拖动创建独特的音乐节奏",
+  "features.devices.title": "多设备支持",
+  "features.devices.description": "在任何设备上享受流畅的游戏体验",
+  "features.share.title": "社交分享",
+  "features.share.description": "与朋友分享你创作的音乐作品",
+  "features.sound.title": "自定义音效",
+  "features.sound.description": "选择并组合不同的音效创作音乐",
 
   // 常见问题区域
   "faq.title": "常见问题",
@@ -137,4 +144,11 @@ export const zh: TranslationObject = {
       home: "返回首页",
     },
   },
+
+  // Error Pages
+  "error.404.title": "页面未找到",
+  "error.404.description": "抱歉，您访问的页面不存在。",
+  "error.404.message": "抱歉，您访问的页面不存在",
+  "error.404.help": "该页面可能已被移动或删除。让我们返回首页！",
+  "error.404.home": "返回首页",
 } as const;

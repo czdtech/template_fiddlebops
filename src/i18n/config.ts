@@ -1,4 +1,4 @@
-import type { Language, LanguageConfig } from "./types";
+import type { Language, LanguageConfig } from "./core/types";
 import { en } from "./translations/en";
 import { zh } from "./translations/zh";
 
@@ -76,7 +76,6 @@ export const ui = {
 
 // 导出类型
 export type Languages = keyof typeof languages;
-export type UiKeys = keyof typeof en;
 
 // 验证翻译键一致性
 const enKeys = Object.keys(en).sort();
