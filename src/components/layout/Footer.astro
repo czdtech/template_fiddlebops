@@ -1,5 +1,5 @@
 ---
-import { useTranslations, getLangFromUrl } from "@/i18n/utils";
+import { useTranslations, getLangFromUrl } from "@/i18n/core/utils";
 import { siteConfig } from "@/config/site";
 import Container from "./Container.astro";
 
@@ -17,7 +17,7 @@ type FooterSection = {
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
 
-const footerLinks = {
+const footerLinks: Record<string, FooterSection> = {
   game: {
     title: t("footer.game"),
     links: [

@@ -1,11 +1,15 @@
 // @ts-check
 import { defineConfig } from "astro/config";
+import path from "path";
 import tailwind from "@astrojs/tailwind";
 import sitemap from "@astrojs/sitemap";
 import react from "@astrojs/react";
 import compress from "astro-compress";
+import { fileURLToPath } from 'url';
 
-// https://astro.build/config
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 export default defineConfig({
   site: "https://fiddlebops.com",
   integrations: [
@@ -40,36 +44,26 @@ export default defineConfig({
     },
   },
   vite: {
+    resolve: {
+      alias: {
+        '@': path.resolve(__dirname, './src'),
+        '@i18n': path.resolve(__dirname, './src/i18n/core')
+      }
+    },
     build: {
-      // 启用代码分割
-      cssCodeSplit: true,
-      // 启用 CSS 压缩
-      cssMinify: true,
-      // 启用 JavaScript 压缩
-      minify: "terser",
-      // Terser 配置
-      terserOptions: {
-        compress: {
-          drop_console: true,
-          drop_debugger: true,
-          pure_funcs: ["console.log"],
-          passes: 2,
-        },
-        mangle: true,
-        format: {
-          comments: false,
-        },
-      },
-      // 配置分块策略
       rollupOptions: {
+        input: {
+          main: path.resolve(__dirname, 'src/pages/404.astro')
+        },
         output: {
-          // 优化代码分割策略
           manualChunks: {
-            // 第三方库分块
             "vendor-react": ["react", "react-dom"],
-            // 功能模块分块
-            game: ["/src/components/sections/GameEmbed.astro"],
-            i18n: ["/src/i18n/utils.ts", "/src/i18n/config.ts"],
+            game: [path.resolve(__dirname, "src/components/sections/GameEmbed.astro")],
+            i18n: [
+              // 更新为正确的路径
+              path.resolve(__dirname, "src/i18n/core/utils.ts"),
+              path.resolve(__dirname, "src/i18n/config.ts")
+            ],
           },
           // 优化资源命名
           assetFileNames: (assetInfo) => {
@@ -89,27 +83,7 @@ export default defineConfig({
           // 优化入口文件命名
           entryFileNames: "assets/js/[name]-[hash].js",
         },
-      },
-      // 配置构建优化
-      reportCompressedSize: false,
-      chunkSizeWarningLimit: 1000,
-    },
-    ssr: {
-      // 外部化依赖以减小服务端包大小
-      external: ["react", "react-dom"],
-    },
-    // 优化资源处理
-    assetsInclude: ["**/*.woff2", "**/*.mp3", "**/*.svg"],
-  },
-  // 输出配置
-  output: "static",
-  // 构建配置
-  build: {
-    // 启用增量构建
-    inlineStylesheets: "auto",
-    // 配置资源处理
-    assets: "assets",
-    // 配置输出目录结构
-    format: "directory",
-  },
+      }
+    }
+  }
 });

@@ -21,17 +21,6 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"]
-    },
-    "moduleResolution": "node",
-    "module": "esnext",
-    "allowSyntheticDefaultImports": true,
-    "isolatedModules": true,
-    "sourceMap": true,
-    "declaration": true,
-    "declarationMap": true,
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true
-  },
-  "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.astro", "src/**/*.d.ts"],
-  "exclude": ["node_modules", "dist", ".astro"]
+    }
+  }
 }

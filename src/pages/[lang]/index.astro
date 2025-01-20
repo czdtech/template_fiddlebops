@@ -3,7 +3,7 @@ import type { Language } from "@/i18n/types";
 import { languages, defaultLang } from "@/i18n/config";
 import { siteConfig } from "@/config/site";
 import { generateGameSchema } from "@/utils/schema";
-import { useTranslations } from "@/i18n/utils";
+import { useTranslations } from "@/i18n/core/utils";
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import Hero from "@/components/sections/Hero.astro";
 import GameEmbed from "@/components/sections/GameEmbed.astro";
@@ -44,8 +44,9 @@ const gameSchema = generateGameSchema(siteConfig, canonicalURL);
 const props = {
   title,
   description,
-  canonicalURL,
-  schema: gameSchema,
+  canonicalURL: canonicalURL.toString(),
+  schema: gameSchema as unknown as Record<string, unknown>,
+  image: siteConfig.ogImage,
   lang,
 };
 ---
