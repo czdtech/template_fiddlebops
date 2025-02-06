@@ -1,8 +1,10 @@
 # build output
 dist/
+.vercel/
 
-# generated types
+# generated types and cache
 .astro/
+.astro-i18n/
 
 # dependencies
 node_modules/
@@ -17,9 +19,12 @@ pnpm-debug.log*
 .env
 .env.production
 .env.local
+.env*.local
 
-# macOS-specific files
+# system files
 .DS_Store
+Thumbs.db
+desktop.ini
 
 # editor directories and files
 .vscode/*
@@ -41,8 +46,14 @@ pnpm-debug.log*
 
 # coverage reports
 coverage/
+.coverage/
 
 # local certificates
 *.pem
 *.crt
-*.key 
+*.key
+
+# Optional: uncomment the following lines if you don't want to commit lock files
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml 
